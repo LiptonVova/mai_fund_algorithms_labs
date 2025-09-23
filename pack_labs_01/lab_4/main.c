@@ -11,6 +11,8 @@
 int main() {
     double e = 0.0001;
 
+    printf("Точность равна %lf\n", e);
+
     double result_e_1 = limit_e(e); 
     double result_e_2 = series_e(e);
     double result_e_3 = equation_e(e);

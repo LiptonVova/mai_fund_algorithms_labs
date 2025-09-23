@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 void print_usage() {
-    printf("./main.out [flag] [path input file] [optinal path output file]\n");
+    printf("./main.out [path input file] [flag] [optinal path output file]\n");
     printf("Для указания выходного файла добавьте к флагу n. Например -nd\n\n");
     printf("Флаги и аргументы:\n");
     printf("-d [-nd] исключить символы арабских цифр из файла\n");

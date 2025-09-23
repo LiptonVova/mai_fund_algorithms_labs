@@ -6,13 +6,13 @@
 #include "include/solve.h"
 
 
-typedef enum {
+enum {
     SUCCESS,
     ERROR_WITHOUT_PARAMETRS,
     ERROR_INVALID_PARAMETR,
     ERROR_INVALID_ARGUMENT,
     ERROR_UNKNOWN_PARAMETR,
-} StatusCodes;
+};
 
 
 int main(int argc, char * argv[]) {

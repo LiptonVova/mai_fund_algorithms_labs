@@ -2,20 +2,29 @@
 #include <stdlib.h>
 #include "include/lab_2.h"
 
-typedef enum {
+enum {
+    SUCCESS,
+    ERROR_NUMBER,
+    ERROR_MALLOC,
     ERROR_BIG_NUMBER,
-} STATUS_CODES;
+};
 
 int main() {
     int T;
+    printf("Введите количество чисел: ");
     scanf("%d", &T);
 
     int * input = malloc(sizeof(int) * T);
     int max_number = -1;
+    printf("Введите %d чисел: ", T);
     for (int i = 0; i < T; ++i) {
         scanf("%d", &input[i]);
         if (input[i] > max_number) {
             max_number = input[i];
+        }
+        if (input[i] < 0) {
+            printf("Номер не может быть отрицательным\n");
+            return ERROR_NUMBER;
         }
     }
 
@@ -26,9 +35,13 @@ int main() {
         return ERROR_BIG_NUMBER;
     }
 
-    int * result = malloc(sizeof(int) * (max_number + 1));
-    int n = max_number * 100;
-    generate_prime_numbers(result, n, max_number);
+
+
+    int * result = generate_prime_numbers(max_number);
+    if (!result) {
+        printf("Ошибка при выделении памяти\n");
+        return ERROR_MALLOC;
+    }
 
     for (int i = 0; i < T; ++i) {
         printf("простое число под номером %d соответствует числу %d\n", input[i], result[input[i] - 1]);
@@ -36,6 +49,5 @@ int main() {
     free(result);
     free(input);
 
-
-    return 0;
+    return SUCCESS;
 }

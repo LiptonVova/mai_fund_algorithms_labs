@@ -5,12 +5,12 @@
 #include "include/main_functions.h"
 
 
-typedef enum {
+enum {
     ERROR_WRONG_COUNT_ARGUMENTS,
     ERROR_MALLOC,  
     ERROR_NOT_NUMBER,
     ERROR_WRONG_ARGUMENT,
-} STATUS_CODES;
+};
 
 
 int main(int argc, char * argv[]) {

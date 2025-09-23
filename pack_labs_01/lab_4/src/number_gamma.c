@@ -50,7 +50,7 @@ double series_gamma(double e) {
 }
 
 double equation_gamma_calc(int t, int *prime_numbers_array, int count, double e) {
-    double proisvedenie = 1;
+    double proisvedenie = 1.0;
     for (int i = 0; i < count; i++) {
         double p = prime_numbers_array[i];
         if ( fabs(p - t) <= e) {

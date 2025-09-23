@@ -83,12 +83,6 @@ int solve(FILE* input, FILE* output) {
             int answer = perevod_min_cc_to_ten_cc(word, index_word, min_cc);
 
             fprintf(output, "%d\n", answer);
-            if (c == ' ') {
-                fprintf(output, " ");
-            }
-            else if (c == '\n') {
-                fprintf(output, "\n");
-            }
 
 
             free(word);
