@@ -9,7 +9,7 @@
 
 
 int main() {
-    double e = 0.0001;
+    double e = 0.00000001;
 
     printf("Точность равна %lf\n", e);
 

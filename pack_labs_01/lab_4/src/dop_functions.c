@@ -12,27 +12,20 @@ double factorial(int n) {
 }
 
 int * prime_numbers(int count) {
-    int * result = malloc(sizeof(int)*count);
-    int SIZE = count * 100;
-    int * numbers = malloc(sizeof(int)*SIZE);
+    int * numbers = malloc(sizeof(int) * count);
 
-    for (int i = 0; i < SIZE; ++i) {
+    for (int i = 0; i < count; ++i) {
         numbers[i] = 0;
     }
 
     int index = 0;
-    for (int i = 2; i < SIZE; ++i) {
+    for (int i = 2; i < count; ++i) {
         if (numbers[i]) {
             continue;
         }
-        result[index++] = i;
-        if (index == count) {
-            break;
-        }
-        for (int j = i; j < SIZE; j += i) {
+        for (int j = i + i; j < count; j += i) {
             numbers[j] = 1;
         }
     }
-    free(numbers);
-    return result;
+    return numbers;
 }

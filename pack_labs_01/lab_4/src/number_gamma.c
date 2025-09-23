@@ -21,6 +21,9 @@ double limit_gamma(double e) {
     double result = limit_gamma_calc(m++);
 
     while (fabs(result - prev_value) >= e) {
+        if (m == 40) {
+            break;
+        }
         prev_value = result;
         result = limit_gamma_calc(m++);
     }
@@ -40,7 +43,7 @@ double series_gamma(double e) {
     double prev_value = prev_prev_value + series_gamma_calc(k++);
     double result = prev_value + series_gamma_calc(k++);
 
-    while ( fabs(result - prev_value) >= e/1000000   || fabs(prev_value - prev_prev_value) >= e/1000000) {
+    while ( fabs(result - prev_value) >= e   || fabs(prev_value - prev_prev_value) >= e) {
         
         prev_prev_value = prev_value;
         prev_value = result;
@@ -49,29 +52,34 @@ double series_gamma(double e) {
     return (equation_pi() * equation_pi())/(-6) + result;
 }
 
-double equation_gamma_calc(int t, int *prime_numbers_array, int count, double e) {
+double equation_gamma_calc(int t, int *prime_numbers_array) {
     double proisvedenie = 1.0;
-    for (int i = 0; i < count; i++) {
-        double p = prime_numbers_array[i];
-        if ( fabs(p - t) <= e) {
-            break;    
+    for (int p = 2; p <= t; p++) {
+        if (prime_numbers_array[p] == 0) {
+            proisvedenie *= ((p - 1.0)/ ((double)(p)));
         }
-        proisvedenie *= ((p-1)/p);
     }
     return log(t) * proisvedenie;
 }
 
 
 double equation_gamma(double e) {
-    int t = 1;
-    int count = 150;
-    int * prime_numbers_array = prime_numbers(count);
-    double prev_value = equation_gamma_calc(t++, prime_numbers_array, count, e);
-    double result = equation_gamma_calc(t++, prime_numbers_array, count, e);
-
-    while (fabs(result - prev_value) >= e) {
+    int t = 2;
+    int t_max = 10000;
+    int * prime_numbers_array = prime_numbers(t_max);
+    if (!prime_numbers_array) {
+        return -1;
+    }
+    double prev_value = equation_gamma_calc(t++, prime_numbers_array);
+    double result = equation_gamma_calc(t++, prime_numbers_array);
+    
+    
+    for ( ; t < t_max; ++t) {
         prev_value = result;
-        result = equation_gamma_calc(t++, prime_numbers_array, count, e);
+        result = equation_gamma_calc(t, prime_numbers_array);
+        if (fabs(result - prev_value) < e) {
+            break;
+        }
     }
     free(prime_numbers_array);
     return -log(result);
