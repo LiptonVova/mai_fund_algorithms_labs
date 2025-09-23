@@ -9,9 +9,9 @@
 
 
 int main() {
-    double e = 0.00000001;
+    double e = 0.000001;
 
-    printf("Точность равна %lf\n", e);
+    printf("Точность равна %.8lf\n", e);
 
     double result_e_1 = limit_e(e); 
     double result_e_2 = series_e(e);

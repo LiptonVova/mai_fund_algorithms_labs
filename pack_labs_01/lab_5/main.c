@@ -48,11 +48,14 @@ int main(int argc, char * argv[]) {
             fclose(file_input);
             return ERROR_COUNT_ARGUMENTS;
         }
-        filename_output = argv[3];
+        filename_output = malloc(sizeof(char) * (strlen(argv[3]) + 1));
+        filename_output[0] = '\0';
+        strcat(filename_output, argv[3]);
     }
     else {
         int length = strlen(filename_input) + 5;
         filename_output = malloc(sizeof(char) * length);
+        filename_output[0] = '\0';
         if (!filename_output) {
             printf("Ошибка при выделении памяти\n");
             fclose(file_input);
@@ -125,6 +128,7 @@ int main(int argc, char * argv[]) {
         return ERROR_WRONG_FLAG;
     }
 
+    free(filename_output);
 
     fclose(file_input);
     fclose(file_output);
