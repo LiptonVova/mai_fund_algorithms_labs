@@ -29,7 +29,7 @@ double* solve_quadratic_equation(double e, double a, double b, double c) {
     }
 
     double d = b * b - 4 * a * c;
-    if (d < e) {
+    if (d < 0) {
         result[0] = NAN;
         result[1] = NAN;
     }
