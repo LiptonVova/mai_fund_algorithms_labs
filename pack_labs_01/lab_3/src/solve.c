@@ -29,12 +29,12 @@ double* solve_quadratic_equation(double e, double a, double b, double c) {
     }
 
     double d = b * b - 4 * a * c;
-    if (d < 0) {
+    if (d < e) {
         result[0] = NAN;
         result[1] = NAN;
     }
 
-    else if (d == 0) {
+    else if (fabs(d) < e) {
         double x = -b/(2 * a);
         result[0] = x;
         result[1] = x;

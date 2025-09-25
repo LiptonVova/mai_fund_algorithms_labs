@@ -10,6 +10,7 @@ enum {
     ERROR_MALLOC,  
     ERROR_NOT_NUMBER,
     ERROR_WRONG_ARGUMENT,
+    ERROR_NOT_INT,
 };
 
 
@@ -33,6 +34,12 @@ int main(int argc, char * argv[]) {
         print_usage();
         return ERROR_NOT_NUMBER;
     } 
+
+    if (strlen(argv[1]) > 10) {
+        printf("Введите число, которое можно преобразовать в int\n");
+        print_usage();
+        return ERROR_NOT_INT;
+    }
 
     const int number = str_to_int(argv[1]);
 

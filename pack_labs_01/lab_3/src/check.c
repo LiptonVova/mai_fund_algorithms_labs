@@ -57,6 +57,6 @@ int check_int_number(char * str) {
         length++;
         ptr++;
     }
-    return length <= 9;
+    return length <= 10;
 }
 
