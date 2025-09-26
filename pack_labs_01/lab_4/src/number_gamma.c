@@ -54,7 +54,7 @@ double series_gamma(double e) {
 
 double equation_gamma_calc(int t, int *prime_numbers_array) {
     double proisvedenie = 1.0;
-    for (int p = 2; p <= t; p++) {
+    for (int p = 2; p < t; p++) {
         if (prime_numbers_array[p] == 0) {
             proisvedenie *= ((p - 1.0)/ ((double)(p)));
         }
@@ -64,24 +64,29 @@ double equation_gamma_calc(int t, int *prime_numbers_array) {
 
 
 double equation_gamma(double e) {
-    int t = 2;
-    int t_max = 10000;
+    int t_max = 1e6;
     int * prime_numbers_array = prime_numbers(t_max);
     if (!prime_numbers_array) {
         return -1;
     }
-    double prev_value = equation_gamma_calc(t++, prime_numbers_array);
-    double result = equation_gamma_calc(t++, prime_numbers_array);
+
+    double result_limit = equation_gamma_calc(t_max, prime_numbers_array);    
     
-    
-    for ( ; t < t_max; ++t) {
-        prev_value = result;
-        result = equation_gamma_calc(t, prime_numbers_array);
-        if (fabs(result - prev_value) < e) {
-            break;
+    double l = 0;
+    double r = 1;
+    double mid;
+
+    while (fabs(r - l) >= e) {
+        mid = (l + r) / 2.0;
+        if (exp(-mid) - result_limit > 0) {
+            l = mid;
+        }
+        else {
+            r = mid;
         }
     }
+
     free(prime_numbers_array);
-    return -log(result);
+    return (l + r) / 2.0;
 
 }
