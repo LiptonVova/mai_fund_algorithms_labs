@@ -6,7 +6,7 @@ double series_e_calc(int n);
 
 double limit_e(double e);
 double series_e(double e);
-double equation_e();
+double equation_e(double e);
 
 
 

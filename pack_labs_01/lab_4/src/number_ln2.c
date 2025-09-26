@@ -33,6 +33,19 @@ double series_ln2(double e) {
     return result;
 }
 
-double equation_ln2() {
-    return log(2);
+double equation_ln2(double e) {
+    double l = 0;
+    double r = 1;
+    double mid;
+
+    while (fabs(r - l) >= e) {
+        mid = (l + r) / 2.0;
+        if (exp(mid) - 2 > 0) {
+            r = mid;
+        }
+        else {
+            l = mid;
+        }
+    }
+    return (l + r) / 2.0;
 }

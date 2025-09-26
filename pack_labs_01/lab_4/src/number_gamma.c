@@ -49,7 +49,7 @@ double series_gamma(double e) {
         prev_value = result;
         result = prev_value + series_gamma_calc(k++);
     }
-    return (equation_pi() * equation_pi())/(-6) + result;
+    return (equation_pi(e) * equation_pi(e))/(-6) + result;
 }
 
 double equation_gamma_calc(int t, int *prime_numbers_array) {

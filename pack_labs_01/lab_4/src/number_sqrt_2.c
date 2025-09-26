@@ -32,6 +32,19 @@ double series_sqrt2(double e) {
     return result;
 }
 
-double equation_sqrt2() {
-    return sqrt(2);
+double equation_sqrt2(double e) {
+    double l = 1;
+    double r = 3;
+
+    double mid;
+    while (fabs(r - l) >= e) {
+        mid = (l + r) / 2.0;
+        if (mid * mid - 2 > 0) {
+            r = mid;
+        }
+        else {
+            l = mid;
+        }
+    }
+    return (l + r)/2.0;
 }

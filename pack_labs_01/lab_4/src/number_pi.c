@@ -44,7 +44,13 @@ double series_pi(double e) {
 }
 
 
-double equation_pi() {
-    return acos(-1);
+double equation_pi(double e) {
+    double value = 3.0;
+
+    while (cos(value) + 1.0  >= e) {
+        value -= (cos(value) + 1)/(-sin(value)); // xk + 1 = xk - f(xk)/f`(xk)
+    }
+
+    return value;
 }
  

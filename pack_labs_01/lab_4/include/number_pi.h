@@ -6,6 +6,6 @@ double series_pi_calc(int n);
 
 double limit_pi(double e);
 double series_pi(double e);
-double equation_pi();
+double equation_pi(double e);
 
 #endif 

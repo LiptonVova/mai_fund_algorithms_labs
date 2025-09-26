@@ -21,20 +21,20 @@ int main() {
 
     double result_pi_1 = limit_pi(e);
     double result_pi_2 = series_pi(e);
-    double result_pi_3 = equation_pi();
+    double result_pi_3 = equation_pi(e);
 
     printf("число пи равно: %lf, %lf, %lf\n", result_pi_1, result_pi_2, result_pi_3);
 
 
     double result_ln2_1 = limit_ln2(e);
     double result_ln2_2 = series_ln2(e);
-    double result_ln2_3 = equation_ln2();
+    double result_ln2_3 = equation_ln2(e);
 
     printf("число ln2 равно: %lf, %lf, %lf\n", result_ln2_1, result_ln2_2, result_ln2_3);
 
     double result_sqrt2_1 = limit_sqrt2(e);
     double result_sqrt2_2 = series_sqrt2(e);
-    double result_sqrt2_3 = equation_sqrt2();
+    double result_sqrt2_3 = equation_sqrt2(e);
 
     printf("число sqrt2 равно: %lf, %lf, %lf\n", result_sqrt2_1, result_sqrt2_2, result_sqrt2_3);
 

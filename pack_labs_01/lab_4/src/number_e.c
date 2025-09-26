@@ -35,7 +35,19 @@ double series_e(double e) {
     return result;
 }
 
-double equation_e() {
-    double result = exp(1.0);
-    return result;
+double equation_e(double e) {
+    double l = 2;
+    double r = 4;
+
+    double mid;
+    while (fabs(r - l) >= e) {
+        mid = (l + r) / 2.0;
+        if (log(mid) - 1 > 0) {
+            r = mid;
+        }
+        else {
+            l = mid;
+        }
+    }
+    return (l + r)/2.0;
 }

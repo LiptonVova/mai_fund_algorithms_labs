@@ -6,7 +6,7 @@ double series_sqrt2_calc(double k);
 
 double limit_sqrt2(double e);
 double series_sqrt2(double e);
-double equation_sqrt2();
+double equation_sqrt2(double e);
 
 
 #endif
