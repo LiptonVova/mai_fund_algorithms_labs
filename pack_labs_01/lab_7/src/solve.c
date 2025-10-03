@@ -60,7 +60,7 @@ int solve(FILE* input, FILE* output) {
     int min_cc;
     do {
         c = fgetc(input);
-        if (c == '\n' || c == ' ' || c == EOF) {
+        if (c == '\n' || c == ' ' || c == EOF || c == '\t') {
             if (index == 0) {
                 continue;
             }

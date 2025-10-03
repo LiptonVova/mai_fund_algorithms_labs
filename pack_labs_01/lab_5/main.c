@@ -61,8 +61,18 @@ int main(int argc, char * argv[]) {
             fclose(file_input);
             return ERROR_MALLOC;
         }
+
+        char *fileName = filename_input;
+        char *lastSlash = strrchr(filename_input, '/');
+
+        if (lastSlash != NULL) {
+            fileName = lastSlash + 1;
+        }
+
+        strncpy(filename_output, filename_input, fileName - filename_input);
+        
         strcat(filename_output, "out_");
-        strcat(filename_output, filename_input);
+        strcat(filename_output, fileName);
     }
 
     FILE * file_output = fopen(filename_output, "w");

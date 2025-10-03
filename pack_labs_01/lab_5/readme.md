@@ -68,6 +68,11 @@ make
 ./main.out input.txt -na output.txt
 ```
 
+## Тест 5
+```
+./main.out ../input.txt -d
+```
+
 
 
 
