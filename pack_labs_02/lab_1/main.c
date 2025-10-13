@@ -6,7 +6,7 @@ int main() {
     
     int n = 5;
     double list[] = {0.2, -0.015625, 1.0/3.0, 131.421, 0, 123.4213};
-    int number_system = 8;
+    int number_system = 2;
     bool* result = define_list_of_finite_fraction(number_system, &error, n, list[0], list[1], list[2], list[3], list[4]);
 
     switch (error) {

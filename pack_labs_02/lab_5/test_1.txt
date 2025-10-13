@@ -1,0 +1,2 @@
+This is an example of a line that contains more than eighty characters and therefore should be split into multiple lines with proper formatting.
+This  line  has  double  spaces  between  words  and  should  be  reformatted  to  fit  exactly  eighty  characters  per  line  properly.

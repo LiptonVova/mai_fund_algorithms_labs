@@ -1,0 +1,1 @@
+MoreThanEightyCharactersLongLineWithoutSpacesToTestBoundaryCaseProcessing!!!LAB_5_VOVA_STRING_VERY_HARD_TEST

@@ -1,0 +1,10 @@
+A
+BB
+   Line with leading and trailing spaces     
+Normal line but then this one is extremely long and should break at the right place between words not in the middle of any word
+Word
+Another test with  multiple   spaces    between    words here
+Exactly80CharactersLongLineWithoutAnySpacesAtAllToTestBoundaryCaseRightHere!!!
+Short
+C
+D

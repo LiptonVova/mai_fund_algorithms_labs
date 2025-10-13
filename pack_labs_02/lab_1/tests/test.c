@@ -2,11 +2,11 @@
 #include <unity.h>
 
 void setUp(void) {
-    // Этот метод вызывается перед каждым тестом
+
 }
 
 void tearDown(void) {
-    // Этот метод вызывается после каждого теста
+
 }
 
 
@@ -33,12 +33,18 @@ void test_1(void) {
 void test_2(void) {
     error_code_t error = SUCCESS;
     
-    int n = 3;
-    double list[] = {0.1, 0.3, 0.7}; // бесконечные в двоичной
-    int number_system = 2;
+    // int n = 3;
+    // double list[] = {0.01, 1.0/3, 1.4}; // бесконечные в двоичной
+    // int number_system = 2555555;
+    
+    // bool* result = define_list_of_finite_fraction(number_system, &error, n, 
+    //                                              list[0], list[1], list[2]);
+    int n = 1;
+    double list[] = {1.4}; // бесконечные в двоичной
+    int number_system = 2555555;
     
     bool* result = define_list_of_finite_fraction(number_system, &error, n, 
-                                                 list[0], list[1], list[2]);
+                                                 list[0]);
     
     TEST_ASSERT_EQUAL(SUCCESS, error);
     TEST_ASSERT_NOT_NULL(result);
@@ -73,9 +79,10 @@ void test_3(void) {
 void test_4(void) {
     error_code_t error = SUCCESS;
     
-    int n = 2;
-    double list[] = {0.0000, 0, -0.000000}; 
-    int number_system = 8;
+    int n = 3;
+    // double list[] = {0.123213, 0.25, 1.0/2, 1.0/3}; 
+    double list[] = {0.125, 0.25, 1.0/2}; 
+    int number_system = 256;
     
     bool* result = define_list_of_finite_fraction(number_system, &error, n, 
                                                  list[0], list[1], list[2]);
