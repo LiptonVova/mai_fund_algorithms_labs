@@ -13,8 +13,8 @@ typedef enum {
     ERROR_STRTOL
 } error_code_t;
 
-int gcd(const int a, const int b);
-int* factorization_number(const int number, error_code_t* error);
+long long gcd(const long long a, const long long b);
+long long* factorization_number(const long long number, error_code_t* error);
 
 
 #endif

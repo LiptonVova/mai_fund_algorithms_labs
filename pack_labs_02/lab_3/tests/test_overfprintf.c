@@ -60,14 +60,14 @@ void test_overfprintf_2(void) {
 }
 
 void test_overfprintf_3(void) {
-    int result = overfprintf(test_file, "%Zr", 34u);
-    TEST_ASSERT_EQUAL_STRING("0010011", read_test_file());
-    TEST_ASSERT_EQUAL(7, result);
-    
-    rewind(test_file);
-    result = overfprintf(test_file, "%Zr", 20u);
+    int result = overfprintf(test_file, "%Zr", 20u);
     TEST_ASSERT_EQUAL_STRING("00101011", read_test_file());
     TEST_ASSERT_EQUAL(8, result);
+    rewind(test_file);
+
+    result = overfprintf(test_file, "%Zr", 34u);
+    TEST_ASSERT_EQUAL_STRING("0000000011", read_test_file());
+    TEST_ASSERT_EQUAL(10, result);
 }
 
 void test_overfprintf_4(void) {
@@ -94,17 +94,18 @@ void test_overfprintf_4(void) {
 void test_overfprintf_5(void) {
     int result = overfprintf(test_file, "%to", "-1010", 2);
     TEST_ASSERT_EQUAL_STRING("-10", read_test_file());
-    TEST_ASSERT_EQUAL(2, result);
-    
-    rewind(test_file);
-    result = overfprintf(test_file, "%to", "-fe", 16);
-    TEST_ASSERT_EQUAL_STRING("-254", read_test_file());
     TEST_ASSERT_EQUAL(3, result);
     
     rewind(test_file);
     result = overfprintf(test_file, "%TO", "FF", 16);
     TEST_ASSERT_EQUAL_STRING("255", read_test_file());
     TEST_ASSERT_EQUAL(3, result);
+    
+    rewind(test_file);
+    result = overfprintf(test_file, "%to", "-fe", 16);
+    TEST_ASSERT_EQUAL_STRING("-254", read_test_file());
+    TEST_ASSERT_EQUAL(4, result);
+    
     
 }
 

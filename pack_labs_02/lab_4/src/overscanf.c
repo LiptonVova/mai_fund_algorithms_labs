@@ -12,18 +12,24 @@ int overfscanf(FILE *stream, const char *format, ...) {
         if (*format == '%') {
             format++; // пропускаем %
             specifier = parse_specifier(format);
-            if (specifier > 0) {
+            if (specifier >= STANDART_SPECIFIER) {
                 int buf_size = 1000;
                 char buffer[buf_size];
-                format += 2; // проходим через спецификатор 
+                char char_specifier = '\0'; // для стандартного спецификатора
+                if (specifier == STANDART_SPECIFIER) {
+                    char_specifier = *format; // стандартный спецификатор 
+                    format += 1; // проходим через спецификатор
+                }
+                else {
+                    format += 2; // проходим через спецификатор
+                }
                 char last_char = *format;  // получаем символ, после которого надо закончить 
                 int length = 0;
                 read_from_stream(&error, stream, buffer, &length, buf_size - 1, last_char);
-                // format++; // пропускаем последний символ
                 if (error != SUCCESS) {
                     break;
                 }
-                handle_specifier(&error, buffer, args, specifier);
+                handle_specifier(&error, buffer, args, specifier, char_specifier);
                 if (error != SUCCESS) {
                     break;
                 }
@@ -34,15 +40,7 @@ int overfscanf(FILE *stream, const char *format, ...) {
                 if (c != *format) {
                     break;
                 }
-                format++;
-            }
-            else if (specifier == STANDART_SPECIFIER) {
-                char char_specifier[32];
-                parse_standart_specifier(&error, &format, char_specifier);
-                count += vfscanf(stream, char_specifier, args);
-                for (int i = 0; i <= strlen(char_specifier); ++i) {
-                    c = fgetc(stream);
-                }
+                // format++;
             }
         }
         
@@ -76,18 +74,24 @@ int oversscanf(const char *buffer, const char *format, ...) {
         if (*format == '%') {
             format++; // пропускаем %
             specifier = parse_specifier(format);
-            if (specifier > 0) {
+            if (specifier >= STANDART_SPECIFIER) {
                 int buf_size = 1000;
                 char buffer_number[buf_size];
-                format += 2; // проходим через спецификатор
+                char char_specifier = '\0'; // для стандартного спецификатора
+                if (specifier == STANDART_SPECIFIER) {
+                    char_specifier = *format; // стандартный спецификатор 
+                    format += 1; // проходим через спецификатор
+                }
+                else {
+                    format += 2; // проходим через спецификатор
+                }
                 char last_char = *format; // получаем символ, после которого надо закончить 
                 int length = 0;
                 read_from_buffer(&error, &buffer, buffer_number, &length, buf_size - 1, last_char);
-                // format++; // пропускаем последний символ
                 if (error != SUCCESS) {
                     break;
                 }
-                handle_specifier(&error, buffer_number, args, specifier);
+                handle_specifier(&error, buffer_number, args, specifier, char_specifier);
                 if (error != SUCCESS) {
                     break;
                 }
@@ -99,13 +103,6 @@ int oversscanf(const char *buffer, const char *format, ...) {
                     break;
                 }
                 buffer++;
-                // format++;
-            }
-            else if (specifier == STANDART_SPECIFIER) {
-                char char_specifier[32];
-                parse_standart_specifier(&error, &format, char_specifier);
-                count += vsscanf(buffer, char_specifier, args);
-                buffer += strlen(char_specifier) + 1;
             }
         }
         else {

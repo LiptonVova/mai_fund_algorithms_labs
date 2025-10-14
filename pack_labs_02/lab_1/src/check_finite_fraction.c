@@ -1,9 +1,9 @@
 #include "../include/check_finite_fraction.h"
 
 
-bool define_finite_fraction_impl(int* factor_denom, int* factor_num_system) {
-    int count_denom = factor_denom[0];
-    int count_number_system = factor_num_system[0];
+bool define_finite_fraction_impl(long long* factor_denom, long long* factor_num_system) {
+    long long count_denom = factor_denom[0];
+    long long count_number_system = factor_num_system[0];
 
     bool flag = false;
     for (int i = 1; i <= count_denom; ++i) {
@@ -23,20 +23,20 @@ bool define_finite_fraction_impl(int* factor_denom, int* factor_num_system) {
 
 bool define_finite_fraction(const int number_system, const double number, error_code_t *error) {
     // определить, можно ли представить в виде конечной дроби
-    int numerator = 0;
-    int denominator = 0;
+    long long numerator = 0;
+    long long denominator = 0;
     numerator_and_denominator_from_fraction(number, &numerator, &denominator, error);
     if (*error == ERROR_STRTOL) {
         return false;
     }
 
-    int* reducing_fraction = reducing_a_fraction(numerator, denominator, error);
+    long long* reducing_fraction = reducing_a_fraction(numerator, denominator, error);
     if (*error == ERROR_DIVIDE_ZERO || *error == ERROR_MALLOC) {
         return false;
     }
 
-    int* factorization_denominator = factorization_number(reducing_fraction[1], error);
-    int* factorization_number_system = factorization_number(number_system, error);
+    long long* factorization_denominator = factorization_number(reducing_fraction[1], error);
+    long long* factorization_number_system = factorization_number(number_system, error);
 
     if (*error == ERROR_MALLOC) {
         return false;

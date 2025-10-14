@@ -1,7 +1,7 @@
 #include "../include/fraction.h"
 
 
-bool validate_fraction(const int denominator, error_code_t* error) {
+bool validate_fraction(const long long denominator, error_code_t* error) {
     if (denominator == 0) {
         *error = ERROR_DIVIDE_ZERO;
         return false;
@@ -9,8 +9,8 @@ bool validate_fraction(const int denominator, error_code_t* error) {
     return true;
 }
 
-void reducing_a_fraction_impl(int* result) {
-    int cur_gcd = gcd(result[0], result[1]);
+void reducing_a_fraction_impl(long long* result) {
+    long long cur_gcd = gcd(result[0], result[1]);
     while (cur_gcd != 1) {
         result[0] = result[0] / cur_gcd;
         result[1] = result[1] / cur_gcd;
@@ -19,12 +19,12 @@ void reducing_a_fraction_impl(int* result) {
     }
 }
 
-int* reducing_a_fraction(const int numerator, const int denominator, error_code_t* error) {
+long long* reducing_a_fraction(const long long numerator, const long long denominator, error_code_t* error) {
     // функция сокращения дроби
     if (!validate_fraction(denominator, error)) {
         return NULL;
     }
-    int* result = (int*)malloc(sizeof(int) * 2);
+    long long* result = (long long*)malloc(sizeof(long long) * 2);
     if (!result) {
         *error = ERROR_MALLOC;
         return NULL;
@@ -65,7 +65,7 @@ void divide_left_and_right_partition(char* str, char* left, char* right, char* p
 }
 
 
-bool convert_char_to_int(int* left, int* right, char* char_left, char* char_right, error_code_t *error) {
+bool convert_char_to_int(long long* left, long long* right, char* char_left, char* char_right, error_code_t *error) {
     char* end_ptr;
     *left = strtol(char_left, &end_ptr, 10);
     if (*end_ptr != '\0') {
@@ -82,18 +82,18 @@ bool convert_char_to_int(int* left, int* right, char* char_left, char* char_righ
 }
 
 
-void num_and_denom_impl(char* char_right, int left, int right, int* num, int* denom) {
-    int int_denominator = 1;
+void num_and_denom_impl(char* char_right, long long left, long long right, long long* num, long long* denom) {
+    long long long_long_denominator = 1;
     for (int i = 0; i < strlen(char_right); ++i) {
-        int_denominator *= 10;
+        long_long_denominator *= 10;
     }
 
-    *num = int_denominator * left + right;
-    *denom = int_denominator;
+    *num = long_long_denominator * left + right;
+    *denom = long_long_denominator;
 }
 
 
-void numerator_and_denominator_from_fraction(const double number, int*num, int*denom, error_code_t* error) {
+void numerator_and_denominator_from_fraction(const double number, long long*num, long long*denom, error_code_t* error) {
     // разделить double на числитель и знаменатель
     char str[50];
     int len = strlen(str);
@@ -112,7 +112,7 @@ void numerator_and_denominator_from_fraction(const double number, int*num, int*d
     
     divide_left_and_right_partition(str, char_left, char_right, ptr_comma);
     
-    int int_left, int_right;
+    long long int_left, int_right;
 
     if (!convert_char_to_int(&int_left, &int_right, char_left, char_right, error)) {
         return;

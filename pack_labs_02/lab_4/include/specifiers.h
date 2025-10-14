@@ -23,9 +23,9 @@ typedef enum {
 
 
 int parse_specifier(const char *format);
-void handle_specifier(error_code_t *error, char *buffer, va_list args, const int specifier);
-void handle_roman_number(error_code_t *error, char* buffer, va_list args);
-void parse_standart_specifier(error_code_t *error, const char**format,  char* char_specifier);
-
+void handle_specifier(error_code_t *error, char *buffer, va_list args, const int specifier, const char char_specifier);
+// void handle_roman_number(error_code_t *error, char* buffer, va_list args);
+// void parse_standart_specifier(error_code_t *error, const char**format,  char* char_specifier);
+void handle_standart_specifier(error_code_t *error, char *buffer, va_list args, const char specifier);
 
 #endif

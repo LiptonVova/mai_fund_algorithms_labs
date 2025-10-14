@@ -66,6 +66,10 @@ void test_oversprintf_3(void) {
     result = oversprintf(buffer, "%Zr", 15u);
     TEST_ASSERT_EQUAL_STRING("00100011", buffer);
     TEST_ASSERT_EQUAL(8, result);
+
+    result = oversprintf(buffer, "%Zr", 34u);
+    TEST_ASSERT_EQUAL_STRING("0000000011", buffer);
+    TEST_ASSERT_EQUAL(10, result);
 }
 
 void test_oversprintf_4(void) {

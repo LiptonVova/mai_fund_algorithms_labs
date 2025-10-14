@@ -10,30 +10,39 @@ int parse_specifier(const char *format) {
     return STANDART_SPECIFIER;
 }
 
-void handle_specifier(error_code_t *error, char *buffer, va_list args, const int specifier) {
+void handle_specifier(error_code_t *error, char *buffer, va_list args, const int specifier, const char char_specifier) {
     if (specifier == ROMAN_NUMBER) handle_roman_number(error, buffer, args);
     else if (specifier == ZECKENDORF) handle_zeckendorf(error, buffer, args);
     else if (specifier == TEN_TO_BASE_CC_LOWER) handle_base_to_ten(error, buffer, args, false);
     else if (specifier == TEN_TO_BASE_CC_UPPER) handle_base_to_ten(error, buffer, args, true);
+    else if (specifier == STANDART_SPECIFIER) handle_standart_specifier(error, buffer, args, char_specifier);
 }
 
-void parse_standart_specifier(error_code_t *error, const char**format,  char* char_specifier) {
-    // записывает спецификатор из format
-
-    char specifier[32] = "%";
-    int len_specifier = 1;
-
-    while (**format && len_specifier < 30) {
-        char c = **format; 
-        specifier[len_specifier++] = c;
-        (*format)++;
-
-        if (isalpha(c) && c != 'l'&& c != 'L' && c != 'h' && c != 'z' && c != 't' && c != 'j') {
-            break;
-        }
+void handle_standart_specifier(error_code_t *error, char *buffer, va_list args, const char specifier) {
+    char * endptr = NULL;
+    if (specifier == 'd') {
+        long result = strtol(buffer, &endptr, 10);
+        int* ptr = va_arg(args, int*);
+        *ptr = result;
+    }
+    else if (specifier == 'u') {
+        unsigned long result = strtoul(buffer, &endptr, 10);
+        unsigned int* ptr = va_arg(args, unsigned int*);
+        *ptr = result;
+    }
+    else if (specifier == 'f') {
+        double result = strtod(buffer, &endptr);
+        float* ptr = va_arg(args, float*);
+        *ptr = result;
+    }
+    else if (specifier == 's') {
+        char* ptr = va_arg(args, char*);
+        strcpy(ptr, buffer);
     }
 
-    specifier[len_specifier] = '\0';
-    char_specifier[0] = '\0';
-    strcpy(char_specifier, specifier);
+    if (endptr == buffer) {
+        *error = ERROR_STANDART_SPECIFIER;
+        return;
+    }
+
 }

@@ -1,10 +1,10 @@
 #include "../include/math_function.h"
 
 
-int gcd(const int a, const int b) {
+long long gcd(const long long a, const long long b) {
     // Наибольший общий делитель
-    int copy_a = abs(a);
-    int copy_b = abs(b);
+    long long copy_a = abs(a);
+    long long copy_b = abs(b);
 
     while ( copy_a != 0 && copy_b != 0) {
         if (copy_a > copy_b) {
@@ -19,15 +19,15 @@ int gcd(const int a, const int b) {
 }
 
 
-void factorization_number_impl(int number, int** result, int buf_size, error_code_t* error) {
+void factorization_number_impl(long long number, long long** result, int buf_size, error_code_t* error) {
     int index = 0; 
-    int divider = 2;
+    long long divider = 2;
 
     while (divider * divider <= number) {
         if (number % divider == 0) {
             if (index + 1 == buf_size) {
                 buf_size *= 2;
-                int* temp = (int*)realloc(*result, sizeof(int) * buf_size);
+                long long* temp = (long long*)realloc(*result, sizeof(long long) * buf_size);
                 if (!temp) {
                     *error = ERROR_MALLOC;
                     return;
@@ -45,10 +45,10 @@ void factorization_number_impl(int number, int** result, int buf_size, error_cod
 }
 
 
-int* handle_factorization_number(int number, error_code_t* error) {
+long long* handle_factorization_number(long long number, error_code_t* error) {
     // вспомогательная функция факторизации числа
     int buf_size = 1;
-    int* result = (int*)malloc(sizeof(int) * buf_size); // в result[0] будет хранится колво делителей
+    long long* result = (long long*)malloc(sizeof(long long) * buf_size); // в result[0] будет хранится колво делителей
    
     if (!result) {
         *error = ERROR_MALLOC;
@@ -68,13 +68,13 @@ int* handle_factorization_number(int number, error_code_t* error) {
 }
 
 
-int* factorization_number(const int number, error_code_t* error) {
+long long* factorization_number(const long long number, error_code_t* error) {
     // факторизация числа
-    int copy_number = number;
+    long long copy_number = number;
     if (copy_number < 0) {
         copy_number *= -1;
     }
-    int* result = handle_factorization_number(copy_number, error);
+    long long* result = handle_factorization_number(copy_number, error);
     if (*error == ERROR_MALLOC) {
         return NULL;
     }

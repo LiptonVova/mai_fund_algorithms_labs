@@ -10,6 +10,7 @@ typedef enum {
     ERROR_ZECKENDORF,
     ERROR_TRANSLATE_BASE_TO_TEN,
     ERROR_FORMAT,
+    ERROR_STANDART_SPECIFIER,
 } error_code_t;
 
 

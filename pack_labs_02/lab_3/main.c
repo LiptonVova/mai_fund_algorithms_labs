@@ -17,6 +17,13 @@ int main() {
     overfprintf(stdout, "10 = %Zr\n", 10u);
     overfprintf(stdout, "20 = %Zr\n", 20u);
     overfprintf(stdout, "15 = %Zr\n", 15u);
+    overfprintf(stdout, "34 = %Zr\n", 34u);
+    overfprintf(stdout, "7 = %Zr\n", 7u);
+    overfprintf(stdout, "4 = %Zr\n", 4u);
+    overfprintf(stdout, "12 = %Zr\n", 12u);
+    overfprintf(stdout, "3 = %Zr\n", 3u);
+    overfprintf(stdout, "1 = %Zr\n", 1u);
+    overfprintf(stdout, "0 = %Zr (завершающая единица) \n", 0u);
     overfprintf(stdout, "\n");
     
     overfprintf(stdout, "4. %%Cv и %%CV - системы счисления:\n");

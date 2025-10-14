@@ -8,8 +8,8 @@ UNITY_SRC=../../Unity/src/unity.c
 all: main.out
 
 test: $(TEST)
-	./test_overfprintf.out
 	./test_oversprintf.out
+	./test_overfprintf.out
 
 clean: 
 	rm -f *.o *.out
