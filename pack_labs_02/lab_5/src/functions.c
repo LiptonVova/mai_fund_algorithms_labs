@@ -42,21 +42,45 @@ void handle_eighty_char_is_space(char* cur_str, char**str) {
     }
 }
 
+// void add_spaces_in_string_impl(int count_spaces_for_gap, int count_spaces_remainder, char * cur_str, FILE *output) {
+//     char result[81];
+//     int index_cur_str = 0;
+//     for (int i = 0; i < 80; ++i) {
+//         result[i] = cur_str[index_cur_str];
+//         index_cur_str++;
+//         if (cur_str[index_cur_str] == ' ') {
+//             while (cur_str[index_cur_str] == ' ') { // если пробел, то надо добавить новых пробелов
+//                 index_cur_str++;
+//             }
+//             for (int j = 0; j < count_spaces_for_gap; ++j) {
+//                 result[++i] = ' ';
+//             }
+//             if (count_spaces_remainder > 0) {
+//                 result[++i] = ' ';
+//                 count_spaces_remainder--;
+//             } 
+//         }
+//     }
+//     result[80] = '\0';
+//     fputs(result, output);
+//     fputc('\n', output);
+// }
+
 void add_spaces_in_string_impl(int count_spaces_for_gap, int count_spaces_remainder, char * cur_str, FILE *output) {
+    int n = strlen(cur_str);
     char result[81];
-    int index_cur_str = 0;
-    for (int i = 0; i < 80; ++i) {
-        result[i] = cur_str[index_cur_str];
-        index_cur_str++;
-        if (cur_str[index_cur_str] == ' ') {
-            while (cur_str[index_cur_str] == ' ') { // если пробел, то надо добавить новых пробелов
-                index_cur_str++;
-            }
+    int index_result = 0;
+    for (int i = 0; i < n; ++i) {
+        result[index_result] = cur_str[i];
+        index_result++;
+        if (i != n - 1 && cur_str[i] != ' ' && cur_str[i + 1] == ' ') { // если мы находимся в новом слове (предыдущий символ != ' ', а след ' ')
             for (int j = 0; j < count_spaces_for_gap; ++j) {
-                result[++i] = ' ';
+                result[index_result] = ' ';
+                index_result++;
             }
             if (count_spaces_remainder > 0) {
-                result[++i] = ' ';
+                result[index_result] = ' ';
+                index_result++;
                 count_spaces_remainder--;
             } 
         }
@@ -76,9 +100,9 @@ void add_spaces_in_string(char* cur_str, FILE*output) {
         if (cur_str[i - 1] != ' ' && cur_str[i] == ' ') { // учитывает двойные пробелы
             count_words++;
         }
-        if (cur_str[i] == ' ') {
-            all_count_spaces++; // если есть двойные пробелы, то мы все равно их равномерно распределим
-        }
+        // if (cur_str[i] == ' ') {
+        //     all_count_spaces++; // если есть двойные пробелы, то мы все равно их равномерно распределим
+        // }
     }
 
     all_count_spaces += (80 - index);
@@ -88,6 +112,7 @@ void add_spaces_in_string(char* cur_str, FILE*output) {
     const int count_spaces_for_gap = all_count_spaces / delim;
     int count_spaces_remainder = all_count_spaces % delim;
 
+    // add_spaces_in_string_impl(count_spaces_for_gap, count_spaces_remainder, cur_str, output);
     add_spaces_in_string_impl(count_spaces_for_gap, count_spaces_remainder, cur_str, output);
 }
 
@@ -112,7 +137,13 @@ void handle_string(char *str, FILE *output) {
         if (str[80] == ' ') { // 81 символ
             // первые 80 символов хорошие, можно обрабатывать
             strncpy(cur_str, str, 80);
-            cur_str[80] = '\0';
+
+            int index = 79;
+            while (cur_str[index] == ' ') {
+                --index;
+            }
+
+            cur_str[++index] = '\0';
             str += 80; // меняем указатель на str
         }
 

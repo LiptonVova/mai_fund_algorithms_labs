@@ -10,6 +10,7 @@ typedef enum {
 } error_code_t ;
 
 int open_file(char* message, char* type, char *filename, FILE **file);
+void solve(FILE *input, FILE *output);
 
 
 #endif
