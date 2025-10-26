@@ -40,13 +40,13 @@ int main() {
     overfprintf(stdout, "\n");
     
     overfprintf(stdout, "6. Дампы памяти:\n");
-    int test_int = -123456;
-    unsigned int test_uint = 123456;
+    int test_int = -1;
+    unsigned int test_uint = 1;
     double test_double = 3.14159;
     float test_float = 2.71828f;
     
-    overfprintf(stdout, "%%mi (int -123456): %mi\n", test_int);
-    overfprintf(stdout, "%%mu (uint 123456): %mu\n", test_uint);
+    overfprintf(stdout, "%%mi (int --1): %mi\n", test_int);
+    overfprintf(stdout, "%%mu (uint 1): %mu\n", test_uint);
     overfprintf(stdout, "%%md (double 3.14159): %md\n", test_double);
     overfprintf(stdout, "%%mf (float 2.71828): %mf\n", test_float);
     overfprintf(stdout, "\n");

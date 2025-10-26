@@ -40,7 +40,6 @@ int overfscanf(FILE *stream, const char *format, ...) {
                 if (c != *format) {
                     break;
                 }
-                // format++;
             }
         }
         
