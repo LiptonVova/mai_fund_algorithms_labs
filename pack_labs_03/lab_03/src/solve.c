@@ -19,6 +19,7 @@ error_code_t solve() {
 
     start_interactive_programm(livers);
 
+    fclose(input_file);
     return error;
 }
 
@@ -62,5 +63,7 @@ void start_interactive_programm(LinkedList_Liver livers) {
 
         handle_choice(&livers, &stack_commands, choice, name_output_file, output_file, &livers_in_file);
     }
+
+    fclose(output_file);
 }
 
