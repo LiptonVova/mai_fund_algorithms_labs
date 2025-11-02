@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include <string.h>
 #include "handles.h"
+#include "config.h"
+#include "utils.h"
+#include "undo.h"
 
 typedef enum {
     SUCCESS, 
@@ -14,10 +17,7 @@ typedef enum {
 
 
 error_code_t solve();
-LinkedList read_livers_from_file(error_code_t *error, FILE* input);
-void insert_sort_livers(LinkedList *livers, Liver liver);
 
-void start_interactive_programm(LinkedList livers);
-void print_info();
+void start_interactive_programm(LinkedList_Liver livers);
 
 #endif

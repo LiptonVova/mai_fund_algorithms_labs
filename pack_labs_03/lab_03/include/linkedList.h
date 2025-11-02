@@ -6,25 +6,25 @@
 
 
 #define DEFINE_LIST_STACK(LIST_TYPE) \
-typedef struct Node { \
+typedef struct Node_##LIST_TYPE { \
     LIST_TYPE data; \
-    struct Node *prev; \
-    struct Node *next; \
-} Node; \
+    struct Node_##LIST_TYPE *prev; \
+    struct Node_##LIST_TYPE *next; \
+} Node_##LIST_TYPE; \
 /* Двусвязный список */ \
 typedef struct { \
-    Node *head; \
-    Node *tail; \
+    Node_##LIST_TYPE *head; \
+    Node_##LIST_TYPE *tail; \
     size_t size; \
     void (*DeleteVoidPtr)(LIST_TYPE); \
     LIST_TYPE (*CopyVoidPtr)(LIST_TYPE); \
     int (*Comporator)(LIST_TYPE, LIST_TYPE); \
     LIST_TYPE (*DefaultValues)(void);\
-} LinkedList; \
+} LinkedList_##LIST_TYPE; \
 /* ----------------- БАЗОВЫЕ ОПЕРАЦИИ ---------------- */ \
 /* Создание пустого списка */ \
-static inline LinkedList create_list(void (*delete_func)(LIST_TYPE), LIST_TYPE (*copy_func)(LIST_TYPE), int (*comp)(LIST_TYPE, LIST_TYPE), LIST_TYPE (*default_constructor)(void)) { \
-    LinkedList list; \
+static inline LinkedList_##LIST_TYPE create_list_##LIST_TYPE(void (*delete_func)(LIST_TYPE), LIST_TYPE (*copy_func)(LIST_TYPE), int (*comp)(LIST_TYPE, LIST_TYPE), LIST_TYPE (*default_constructor)(void)) { \
+    LinkedList_##LIST_TYPE list; \
     list.head = NULL; \
     list.tail = NULL; \
     list.size = 0; \
@@ -35,8 +35,8 @@ static inline LinkedList create_list(void (*delete_func)(LIST_TYPE), LIST_TYPE (
     return list; \
 } \
 /* Добавление элемента в конец списка */ \
-static inline void push_back_list(LinkedList *list, LIST_TYPE value) { \
-    Node* new_node = (Node*)malloc(sizeof(Node)); \
+static inline void push_back_list_##LIST_TYPE(LinkedList_##LIST_TYPE *list, LIST_TYPE value) { \
+    Node_##LIST_TYPE* new_node = (Node_##LIST_TYPE*)malloc(sizeof(Node_##LIST_TYPE)); \
     if (!new_node) return; \
     new_node->data = list->CopyVoidPtr(value); \
     /* добавили в конец, значит new_node становится tail */ \
@@ -52,8 +52,8 @@ static inline void push_back_list(LinkedList *list, LIST_TYPE value) { \
     if (!list->head) list->head = new_node; /* если список был пустой, то head == tail == new_node */ \
 } \
 /* Добавление элемента в начало списка */ \
-static inline void push_front_list(LinkedList *list, LIST_TYPE value) { \
-    Node* new_node = (Node*)malloc(sizeof(Node)); \
+static inline void push_front_list_##LIST_TYPE(LinkedList_##LIST_TYPE *list, LIST_TYPE value) { \
+    Node_##LIST_TYPE* new_node = (Node_##LIST_TYPE*)malloc(sizeof(Node_##LIST_TYPE)); \
     if (!new_node) return; \
     new_node->data = list->CopyVoidPtr(value); \
     /* добавляем в начало, значит new_node становится новый head */ \
@@ -68,10 +68,10 @@ static inline void push_front_list(LinkedList *list, LIST_TYPE value) { \
     if (!list->tail) list->tail = new_node; /* если список был пустой, то head == tail == new_node */ \
 } \
 /* Удаление элемента с конца списка */ \
-static inline void pop_back_list(LinkedList *list) { \
+static inline void pop_back_list_##LIST_TYPE(LinkedList_##LIST_TYPE *list) { \
     if (list->size == 0) return ; /* если список пустой, то ничего не делать */ \
     list->size--; \
-    Node* delete_node = list->tail; /* сохранить указатель на удаляемый элемент */ \
+    Node_##LIST_TYPE* delete_node = list->tail; /* сохранить указатель на удаляемый элемент */ \
     list->tail = list->tail->prev; /* новый последний элемент */ \
     /* проверка на if (list->tail) нужна, если у нас один элемент в списке */ \
     if (list->tail) { \
@@ -84,10 +84,10 @@ static inline void pop_back_list(LinkedList *list) { \
     free(delete_node); \
 } \
 /*Удаление элемента с начала списка */ \
-static inline void pop_front_list(LinkedList *list) { \
+static inline void pop_front_list_##LIST_TYPE(LinkedList_##LIST_TYPE *list) { \
     if (list->size == 0) return ; /* если список пустой, то ничего не делать */ \
     list->size--; \
-    Node* delete_node = list->head; /* сохранить указатель на удаляемый элемент */ \
+    Node_##LIST_TYPE* delete_node = list->head; /* сохранить указатель на удаляемый элемент */ \
     list->head = list->head->next; /* новый последний элемент */ \
     /* проверка на if (list->head) нужна, если у нас один элемент в списке */ \
     if (list->head) { \
@@ -100,17 +100,17 @@ static inline void pop_front_list(LinkedList *list) { \
     free(delete_node); \
 } \
 /* Вставка элемента по индексу */ \
-static inline void insert_at_list(LinkedList *list, size_t index, LIST_TYPE value) { \
+static inline void insert_at_list_##LIST_TYPE(LinkedList_##LIST_TYPE *list, size_t index, LIST_TYPE value) { \
     if (index < 0 || index > list->size) return; \
     if (index == list->size) { \
-        push_back_list(list, value); /* пытаемся добавить в самый конец */ \
+        push_back_list_##LIST_TYPE(list, value); /* пытаемся добавить в самый конец */ \
         return; \
     } \
-    Node* node_index = list->head; /* узел, который до вставки находится по индексу index */ \
+    Node_##LIST_TYPE* node_index = list->head; /* узел, который до вставки находится по индексу index */ \
     for (size_t i = 0; i < index; ++i) { \
         node_index = node_index->next; \
     } \
-    Node* new_node = (Node*)malloc(sizeof(Node)); \
+    Node_##LIST_TYPE* new_node = (Node_##LIST_TYPE*)malloc(sizeof(Node_##LIST_TYPE)); \
     if (!new_node) return; \
     new_node->data = list->CopyVoidPtr(value); \
     new_node->next = node_index; \
@@ -127,9 +127,9 @@ static inline void insert_at_list(LinkedList *list, size_t index, LIST_TYPE valu
     list->size++; \
 } \
 /* Удаление элемента по индексу */ \
-static inline void delete_at_list(LinkedList *list, size_t index) { \
+static inline void delete_at_list_##LIST_TYPE(LinkedList_##LIST_TYPE *list, size_t index) { \
     if (index < 0 || index >= list->size) return; \
-    Node * delete_node = list->head; \
+    Node_##LIST_TYPE * delete_node = list->head; \
     for (size_t i = 0; i < index; ++i) { \
         delete_node = delete_node->next; \
     } \
@@ -150,11 +150,11 @@ static inline void delete_at_list(LinkedList *list, size_t index) { \
     free(delete_node); \
 } \
 /* Получение элемента по индексу */ \
-static inline LIST_TYPE get_at_list(const LinkedList *list, size_t index) { \
+static inline LIST_TYPE get_at_list_##LIST_TYPE(const LinkedList_##LIST_TYPE *list, size_t index) { \
     if (index < 0 || index >= list->size) { \
         return list->DefaultValues(); \
     } \
-    Node * cur_node = list->head; \
+    Node_##LIST_TYPE * cur_node = list->head; \
     for (size_t i = 0; i < index; ++i) { \
         cur_node = cur_node->next; \
     } \
@@ -162,10 +162,10 @@ static inline LIST_TYPE get_at_list(const LinkedList *list, size_t index) { \
 } \
 /* Сравнение двух списков (лексикографически) */ \
 /* возвращает 1 — равны, 0 — не равны */ \
-static inline int is_equal_list(const LinkedList *l1, const LinkedList *l2) { \
+static inline int is_equal_list_##LIST_TYPE(const LinkedList_##LIST_TYPE *l1, const LinkedList_##LIST_TYPE *l2) { \
     if (l1->size != l2->size) return 0; \
-    Node * node_1 = l1->head; \
-    Node * node_2 = l2->head; \
+    Node_##LIST_TYPE * node_1 = l1->head; \
+    Node_##LIST_TYPE * node_2 = l2->head; \
     for (size_t i = 0; i < l1->size; ++i) { \
         if (!l1->Comporator(node_1->data, node_2->data)) { \
             return 0; \
@@ -176,29 +176,29 @@ static inline int is_equal_list(const LinkedList *l1, const LinkedList *l2) { \
     return 1; \
 } \
 /* Очистка содержимого списка (удаление всех элементов) */ \
-static inline void erase_list(LinkedList *list) { \
+static inline void erase_list_##LIST_TYPE(LinkedList_##LIST_TYPE *list) { \
     while (list->head != NULL) { \
-        pop_front_list(list); /* удаляем все элементы */ \
+        pop_front_list_##LIST_TYPE(list); /* удаляем все элементы */ \
     } \
 } \
 /* Полное удаление списка (освобождение ресурсов) */ \
-static inline void delete_list(LinkedList *list) { \
+static inline void delete_list_##LIST_TYPE(LinkedList_##LIST_TYPE *list) { \
     while (list->head != NULL) { \
-        pop_front_list(list); /* удалили из списка первый элемент */ \
+        pop_front_list_##LIST_TYPE(list); /* удалили из списка первый элемент */ \
         /* pop_front_list сам освобождает память */ \
     } \
 } \
 /* ----------------- СТЕК ----------------- */ \
 /* Поместить элемент на вершину стека */ \
-static inline void push_stack(LinkedList *stack, LIST_TYPE value) { \
-    push_back_list(stack, value); \
+static inline void push_stack_##LIST_TYPE(LinkedList_##LIST_TYPE *stack, LIST_TYPE value) { \
+    push_back_list_##LIST_TYPE(stack, value); \
 } \
 /* Извлечь элемент с вершины стека */ \
-static inline void pop_stack(LinkedList *stack) { \
-    pop_back_list(stack); \
+static inline void pop_stack_##LIST_TYPE(LinkedList_##LIST_TYPE *stack) { \
+    pop_back_list_##LIST_TYPE(stack); \
 } \
 /* Получить элемент с вершины стека без удаления */ \
-static inline LIST_TYPE peek_stack(const LinkedList *stack) { \
+static inline LIST_TYPE peek_stack_##LIST_TYPE(const LinkedList_##LIST_TYPE *stack) { \
     if (stack->size > 0) { \
         return stack->tail->data; \
     } \
@@ -206,15 +206,15 @@ static inline LIST_TYPE peek_stack(const LinkedList *stack) { \
 } \
 /* ---------------- ОЧЕРЕДЬ ----------------- */ \
 /* Добавить элемент в очередь */ \
-static inline void enqueue(LinkedList *queue, LIST_TYPE value) { \
-    push_front_list(queue, value); \
+static inline void enqueue_##LIST_TYPE(LinkedList_##LIST_TYPE *queue, LIST_TYPE value) { \
+    push_front_list_##LIST_TYPE(queue, value); \
 } \
 /* Извлечь элемент из очереди */ \
-static inline void dequeue(LinkedList *queue) { \
-    pop_back_list(queue); \
+static inline void dequeue_##LIST_TYPE(LinkedList_##LIST_TYPE *queue) { \
+    pop_back_list_##LIST_TYPE(queue); \
 } \
 /* Получить первый элемент очереди без удаления */ \
-static inline LIST_TYPE peek_queue(const LinkedList *queue) { \
+static inline LIST_TYPE peek_queue_##LIST_TYPE(const LinkedList_##LIST_TYPE *queue) { \
     if (queue->size > 0) { \
         return queue->head->data; \
     } \

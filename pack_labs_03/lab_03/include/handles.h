@@ -4,24 +4,17 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include "linkedList.h"
 
+// полезные функции
+#include "utils.h"
 
-typedef struct {
-    size_t id;
-    char surname[100];
-    char name[100];
-    char middle_name[100];
-    int day_birthday;
-    int month_birthday;
-    int year_birthday;
-    char gender;
-    double average_income;
-} Liver ;
+// заголовочные файлы для конкретной команды
+#include "search.h"
+#include "edit.h"
 
-// двусвязный список жителей
-DEFINE_LIST_STACK(Liver)
-
+// заголовочные файлы для структур 
+#include "config.h"
+#include "undo.h"
 
 typedef enum {
     DEFAULT = 0,
@@ -50,12 +43,11 @@ typedef enum {
     EDIT_NAME = 2,
     EDIT_MIDDLE_NAME = 3,
     EDIT_DATE_BIRTHDAY = 4,
-    EDIT_GENDER = 5, 
-    EXIT_EDIT = 6
+    EDIT_GENDER = 5,
+    EDIT_INCOME = 6,
+    EXIT_EDIT = 7
 } ChoicesEdit;
 
-void handle_choice(LinkedList livers, int choice);
-
-
+void handle_choice(LinkedList_Liver *livers, LinkedList_Command *stack_commands, int choice, char * name_output_file, FILE* output_file);
 
 #endif
