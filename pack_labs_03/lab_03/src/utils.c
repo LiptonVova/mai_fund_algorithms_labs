@@ -1,6 +1,38 @@
 #include "../include/utils.h"
 
 
+void write_in_file_desciptor(FILE *output, LinkedList_Liver livers) {
+    if (livers.size == 0) {
+        fprintf(output, "Еще нет ни одного жителя!\n");
+        fflush(output);
+        return;
+    }
+
+    Node_Liver *node = livers.head;
+    Liver liver = node->data;
+    for (size_t i = 0; i < livers.size; ++i) {
+        print_liver(output, liver);
+
+        node = node->next;
+        if (node) liver = node->data;
+    }
+}
+
+
+LinkedList_Liver copy_linked_list_livers(LinkedList_Liver livers) {
+    LinkedList_Liver copy_livers = create_list_Liver(delete_func, copy_func, comp, default_constructor);
+
+    Node_Liver * cur_node = livers.head;
+    for (size_t i = 0; i < livers.size; ++i) {
+        Liver copy_liver = copy_func(cur_node->data);
+        push_back_list_Liver(&copy_livers, copy_liver);
+        cur_node = cur_node->next;
+    }
+
+    return copy_livers;
+}
+
+
 int compare_by_birthdate(const Liver a, const Liver b) {
     if (a.year_birthday != b.year_birthday)
         return a.year_birthday - b.year_birthday;

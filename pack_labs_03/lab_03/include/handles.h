@@ -48,6 +48,8 @@ typedef enum {
     EXIT_EDIT = 7
 } ChoicesEdit;
 
-void handle_choice(LinkedList_Liver *livers, LinkedList_Command *stack_commands, int choice, char * name_output_file, FILE* output_file);
+void handle_print(FILE* output, LinkedList_Liver livers);
+
+void handle_choice(LinkedList_Liver *livers, LinkedList_Command *stack_commands, int choice, char * name_output_file, FILE* output_file, LinkedList_Liver *liver_in_file);
 
 #endif

@@ -3,21 +3,7 @@
 
 
 void handle_print(FILE* output, LinkedList_Liver livers) {
-    if (livers.size == 0) {
-        fprintf(output, "Еще нет ни одного жителя!\n");
-        fflush(output);
-        return;
-    }
-
-    Node_Liver *node = livers.head;
-    Liver liver = node->data;
-    for (size_t i = 0; i < livers.size; ++i) {
-        print_liver(output, liver);
-
-        node = node->next;
-        if (node) liver = node->data;
-    }
-
+    write_in_file_desciptor(output, livers);
 }
 
 void handle_search(LinkedList_Liver livers) {
@@ -120,6 +106,8 @@ void handle_edit(LinkedList_Liver *livers, LinkedList_Command *stack_commands) {
     Liver new_liver = copy_func(cur_node->data);
     
     command.new_liver = new_liver; // житель после изменений
+    // создаем пустой список
+    command.livers = create_list_Liver(delete_func, copy_func,comp, default_constructor);
     push_stack_Command(stack_commands, command);
 
 
@@ -153,6 +141,8 @@ void handle_delete(LinkedList_Liver *livers, LinkedList_Command *stack_commands)
         command.name_command = DELETE_LIVER;
         command.old_liver = copy_func(cur_node->data); // житель до изменений
         command.new_liver = default_constructor(); // default liver
+        // создаем пустой список
+        command.livers = create_list_Liver(delete_func, copy_func,comp, default_constructor);
         push_stack_Command(stack_commands, command);
 
         delete_at_list_Liver(livers, index);
@@ -194,6 +184,8 @@ void handle_add(LinkedList_Liver *livers, LinkedList_Command *stack_commands) {
     command.name_command = ADD_LIVER;
     command.old_liver = default_constructor(); // default liver
     command.new_liver = copy_func(new_liver); // новый житель
+    // создаем пустой список
+    command.livers = create_list_Liver(delete_func, copy_func,comp, default_constructor);
     push_stack_Command(stack_commands, command);
 
     insert_sort_livers(livers, new_liver);
@@ -201,11 +193,29 @@ void handle_add(LinkedList_Liver *livers, LinkedList_Command *stack_commands) {
 }
 
 
-void handle_choice(LinkedList_Liver *livers, LinkedList_Command *stack_commands, int choice, char * name_output_file, FILE* output_file) {
+void handle_save_in_file(LinkedList_Liver *livers, LinkedList_Command *stack_commands, char * name_output_file, FILE* output_file, LinkedList_Liver *livers_in_file) {
+    // переоткрываю файл, чтобы стереть все данные с файла
+    output_file = freopen(name_output_file, "w", output_file); 
+    if (!output_file) {
+        printf("Ошибка при открытии файла %s", name_output_file);
+        return ;
+    }
+
+    Command command;
+    command.name_command = SAVE_FILE;
+    command.old_liver = default_constructor();
+    command.new_liver = default_constructor();
+    command.livers = copy_linked_list_livers(*livers_in_file);
+  
+    push_stack_Command(stack_commands, command);
+    handle_print(output_file, *livers);
+
+    // записали новых житиелей в файл, поэтому перезаписываем
+    *livers_in_file = copy_linked_list_livers(*livers);
+}
+
+void handle_choice(LinkedList_Liver *livers, LinkedList_Command *stack_commands, int choice, char * name_output_file, FILE* output_file, LinkedList_Liver *livers_in_file) {
     switch (choice) {
-        case DEFAULT:
-            printf("Неизвестная ошибка\n");
-            break;
         case SEARCH:
             handle_search(*livers);
             break;
@@ -219,16 +229,10 @@ void handle_choice(LinkedList_Liver *livers, LinkedList_Command *stack_commands,
             handle_add(livers, stack_commands);
             break;
         case SAVE_IN_FILE:
-            // переоткрываю файл, чтобы стереть все данные с файла
-            output_file = freopen(name_output_file, "w", output_file); 
-            if (!output_file) {
-                printf("Ошибка при открытии файла %s", name_output_file);
-                break;
-            }
-            handle_print(output_file, *livers);
+            handle_save_in_file(livers, stack_commands, name_output_file, output_file, livers_in_file);
             break;
         case UNDO:
-            handle_undo(livers, stack_commands);
+            handle_undo(livers, stack_commands, name_output_file, output_file);
             break;
         case PRINT:
             handle_print(stdout, *livers);
@@ -237,5 +241,8 @@ void handle_choice(LinkedList_Liver *livers, LinkedList_Command *stack_commands,
             printf("Будем рады, если навестите нас снова\n");
             printf("Программа завершается...\n");
             return; 
+        default:
+            printf("Неизвестная ошибка\n");
+            break;
     }
 }

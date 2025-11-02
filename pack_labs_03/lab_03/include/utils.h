@@ -6,6 +6,9 @@
 #include <stdio.h>
 
 
+void write_in_file_desciptor(FILE *output, LinkedList_Liver livers);
+LinkedList_Liver copy_linked_list_livers(LinkedList_Liver livers);
+
 void insert_sort_livers(LinkedList_Liver *livers, Liver liver);
 LinkedList_Liver read_livers_from_file(FILE* input);
 

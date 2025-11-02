@@ -50,13 +50,17 @@ void start_interactive_programm(LinkedList_Liver livers) {
 
     printf("--Успешно создано!\n");
 
+    // двусвязный список, который хранит что записали в файл
+    // пока файл пустой, поэтому создаем пустой список
+    LinkedList_Liver livers_in_file = create_list_Liver(delete_func, copy_func, comp, default_constructor);
+
     int choice = DEFAULT;
     while (choice != BREAK) {
         print_info();
         printf("Ваш выбор: ");
         scanf("%d", &choice);
 
-        handle_choice(&livers, &stack_commands, choice, name_output_file, output_file);
+        handle_choice(&livers, &stack_commands, choice, name_output_file, output_file, &livers_in_file);
     }
 }
 
