@@ -28,6 +28,8 @@ unsigned int bit_decrement(unsigned int x) {
 
 
 void translate_to_base(const unsigned int number, const int r, char *result) {
+    if (r < 1 || r > 5) return;
+
     unsigned int copy_number = number;
     const unsigned int total_bits = 64;
     char cur_result[bit_increment(total_bits)];
