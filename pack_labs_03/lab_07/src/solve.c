@@ -27,7 +27,7 @@ void solve(int argc, char **argv) {
 }
 
 Token define_token(const char c) {
-    int n = 6;
+    const int n = 6;
     char operators[] = "+-*/^~";
     for (int i = 0; i < n; ++i) {
         if (c == operators[i]) {
@@ -50,6 +50,32 @@ Token define_token(const char c) {
     return UNKNOWN;
 }
 
+error_code_t convert_and_push_to_queue(char *buffer_number, int* index_buffer_number, LinkedList_Element *input_queue) {
+    buffer_number[*index_buffer_number] = '\0';
+    // если сейчас не число, а до этого было число 
+    // значит надо преобразовать его в int и добавить во входную очередь
+    char *endptr;
+    int value = strtol(buffer_number, &endptr, 10);
+    if (*endptr != '\0') {
+        printf("-- Ошибка при преобразовании числа\n");
+        return ERROR_PARSE_TOKENS;
+    }
+
+    // обнуляем буффер
+    *index_buffer_number = 0;
+    buffer_number[*index_buffer_number] = '\0';
+
+    // значит получилось преобразовать число
+    // создаем элемент и добавляем его во входную очередь
+    Element element;
+    element.token = NUMBER;
+    element.value.int_value = value;
+
+    enqueue_Element(input_queue, element);
+
+    return SUCCESS;
+}
+
 error_code_t parse_tokens(char *str_expression, LinkedList_Element *input_queue) {
     int index = 0;
     char c = str_expression[index++];
@@ -63,27 +89,8 @@ error_code_t parse_tokens(char *str_expression, LinkedList_Element *input_queue)
         }                
 
         else if (define_token(prev_c) == NUMBER) {
-            buffer_number[index_buffer_number] = '\0';
-            // если сейчас не число, а до этого было число 
-            // значит надо преобразовать его в int и добавить во входную очередь
-            char *endptr;
-            int value = strtol(buffer_number, &endptr, 10);
-            if (*endptr != '\0') {
-                printf("-- Ошибка при преобразовании числа\n");
-                return ERROR_PARSE_TOKENS;
-            }
-
-            // обнуляем буффер
-            index_buffer_number = 0;
-            buffer_number[index_buffer_number] = '\0';
-
-            // значит получилось преобразовать число
-            // создаем элемент и добавляем его во входную очередь
-            Element element;
-            element.token = NUMBER;
-            element.value.int_value = value;
-
-            enqueue_Element(input_queue, element);
+            error_code_t error = convert_and_push_to_queue(buffer_number, &index_buffer_number, input_queue);
+            if (error != SUCCESS) return error;
         }
 
         Token cur_token = define_token(c);
@@ -104,23 +111,9 @@ error_code_t parse_tokens(char *str_expression, LinkedList_Element *input_queue)
     }
 
     if (define_token(prev_c) == NUMBER) {
-        buffer_number[index_buffer_number] = '\0';
-        // если сейчас не число, а до этого было число 
-        // значит надо преобразовать его в int и добавить во входную очередь
-        char *endptr;
-        int value = strtol(buffer_number, &endptr, 10);
-        if (*endptr != '\0') {
-            printf("-- Ошибка при преобразовании числа\n");
-            return ERROR_PARSE_TOKENS;
-        }
-
-        // значит получилось преобразовать число
-        // создаем элемент и добавляем его во входную очередь
-        Element element;
-        element.token = NUMBER;
-        element.value.int_value = value;
-
-        enqueue_Element(input_queue, element);
+        // если в конце осталось необработанное число 
+        error_code_t error =convert_and_push_to_queue(buffer_number, &index_buffer_number, input_queue);
+        if (error != SUCCESS) return error;
     }
 
     return SUCCESS;
@@ -171,6 +164,71 @@ error_code_t calculate_binary_operator(Element operator, Element operand_1, Elem
     return SUCCESS;
 }
 
+error_code_t handle_unary_operator(LinkedList_Element *temp_stack) {
+    // нужно извлечь элемент, и преобразовать его и добавить обратно в стек
+
+    if (temp_stack->size == 0) {
+        printf("-- Ошибка при вычислении выражения\n");
+        return ERROR_CALCULATE;
+    }
+    Element top_stack = peek_stack_Element(temp_stack);
+    pop_stack_Element(temp_stack);
+
+    Element new_stack_element;
+    new_stack_element.token = NUMBER;
+    new_stack_element.value.int_value = top_stack.value.int_value * (-1); // унарный только минус 
+
+    push_stack_Element(temp_stack, new_stack_element);
+
+    return SUCCESS;
+}
+
+error_code_t handle_binary_operator(Element top_element, LinkedList_Element *temp_stack) {
+    // достаем два операнда из стека
+    // причем первым достается второй элемент 
+    // вторым достается первый элемент
+    // производим соответствующую операцию
+    // и обратно пихаем в стек
+
+    if (temp_stack->size < 2) {
+        printf("-- Ошибка при вычислении выражения\n");
+        return ERROR_CALCULATE;
+    }
+
+    Element top_stack = peek_stack_Element(temp_stack);
+    pop_stack_Element(temp_stack);
+    Element second_top_stack = peek_stack_Element(temp_stack);
+    pop_stack_Element(temp_stack);
+
+    int cur_result = 0;
+    error_code_t error = calculate_binary_operator(top_element, second_top_stack, top_stack, &cur_result);
+    if (error != SUCCESS) return error;
+
+    Element new_stack_element;
+    new_stack_element.token = NUMBER;
+    new_stack_element.value.int_value = cur_result;
+
+    push_stack_Element(temp_stack, new_stack_element);
+
+    return SUCCESS;
+}
+
+error_code_t handle_variable(Element top_element, int* table_variables, LinkedList_Element *temp_stack) {
+    // если это переменная, то надо посмотреть, если ли она в таблице переменных
+    int index = top_element.value.char_value - 'A';
+    if (table_variables[index] == INT_MIN) {
+        printf("-- Неизвестная переменная: %c\n", top_element.value.char_value);
+        return ERROR_CALCULATE;
+    }
+
+    Element new_stack_element;
+    new_stack_element.token = NUMBER;
+    new_stack_element.value.int_value = table_variables[index];
+    push_stack_Element(temp_stack, new_stack_element);
+
+    return SUCCESS;
+}
+
 error_code_t calculate_expression(LinkedList_Element *output_queue, int* table_variables, int *result) {
     // вычисление выражения в постфиксной форме записи
 
@@ -186,45 +244,15 @@ error_code_t calculate_expression(LinkedList_Element *output_queue, int* table_v
             // если это оператор, то надо проверить, бинарный или унарный этот оператор
             if (top_element.value.char_value == '~') {
                 // значит это унарный оператор
-                // нужно извлечь элемент, и преобразовать его и добавить обратно в стек
 
-                if (temp_stack.size == 0) {
-                    printf("-- Ошибка при вычислении выражения\n");
-                    return ERROR_CALCULATE;
-                }
-                Element top_stack = peek_stack_Element(&temp_stack);
-                pop_stack_Element(&temp_stack);
-
-                Element new_stack_element;
-                new_stack_element.token = NUMBER;
-                new_stack_element.value.int_value = top_stack.value.int_value * (-1);
-
-                push_stack_Element(&temp_stack, new_stack_element);
+                error_code_t error = handle_unary_operator(&temp_stack);
+                if (error != SUCCESS) return error;
             }
 
             else {
-                // значит это бинарный оператор 
-                
-                if (temp_stack.size < 2) {
-                    printf("-- Ошибка при вычислении выражения\n");
-                    return ERROR_CALCULATE;
-                }
-
-                Element top_stack = peek_stack_Element(&temp_stack);
-                pop_stack_Element(&temp_stack);
-                Element second_top_stack = peek_stack_Element(&temp_stack);
-                pop_stack_Element(&temp_stack);
-
-                int cur_result = 0;
-                error_code_t error = calculate_binary_operator(top_element, second_top_stack, top_stack, &cur_result);
+                // значит это бинарный оператор                
+                error_code_t error = handle_binary_operator(top_element, &temp_stack);
                 if (error != SUCCESS) return error;
-
-                
-                Element new_stack_element;
-                new_stack_element.token = NUMBER;
-                new_stack_element.value.int_value = cur_result;
-
-                push_stack_Element(&temp_stack, new_stack_element);
             }
         }
 
@@ -234,17 +262,8 @@ error_code_t calculate_expression(LinkedList_Element *output_queue, int* table_v
         }
 
         else if (top_element.token == VARIABLE) {
-            // если это переменная, то надо посмотреть, если ли она в таблице переменных
-            int index = top_element.value.char_value - 'A';
-            if (table_variables[index] == INT_MIN) {
-                printf("-- Неизвестная переменная: %c\n", top_element.value.char_value);
-                return ERROR_CALCULATE;
-            }
-
-            Element new_stack_element;
-            new_stack_element.token = NUMBER;
-            new_stack_element.value.int_value = table_variables[index];
-            push_stack_Element(&temp_stack, new_stack_element);
+            error_code_t error = handle_variable(top_element, table_variables, &temp_stack);
+            if (error != SUCCESS) return error;
         }
 
         else {
@@ -266,6 +285,7 @@ error_code_t calculate_expression(LinkedList_Element *output_queue, int* table_v
 }
 
 void handle_final_logic(char *str, int result, TypeOperation type_operation, int* table_variables, FILE* log_file, int count) {
+    // логирование и финальная логика
     fprintf(log_file, "[%d] %s | ", count, str);
 
 
@@ -337,10 +357,12 @@ error_code_t interpretator(FILE* input_file, FILE* log_file) {
         error = parse_expression(&input_queue, &output_queue);
         if (error != SUCCESS) return error;
 
+        // вычислить выражение в постфиксной форме записи
         int result = 0; 
         error = calculate_expression(&output_queue, table_variables, &result);
         if (error != SUCCESS) return error;
 
+        // выполнение логики (либо присваивание, либо принт) + логирование
         handle_final_logic(str, result, type_operation, table_variables, log_file, count);
 
         ++count;
