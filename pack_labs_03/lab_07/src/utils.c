@@ -60,3 +60,22 @@ void define_type_operation(char* str, TypeOperation* type_operation) {
         *type_operation = ERROR_EXPRESSION;
     }
 }
+
+int fast_raise_to_the_power(const int base, const int exponent) {
+    // base - основание степени
+    // exponent - показатель степени
+
+    int result = 1;
+    int n = exponent;
+    int copy_base = base;
+
+    while (n > 0) {
+        if (n & 1) { // единица на конце
+            result *= copy_base;
+        }
+
+        copy_base *= copy_base; // возводим в квадрат base
+        n = n >> 1; // сдигаем вправо, чтобы обработать последний бит        
+    }
+    return result;
+}

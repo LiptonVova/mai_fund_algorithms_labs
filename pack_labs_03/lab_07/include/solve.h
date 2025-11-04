@@ -9,7 +9,7 @@
 
 
 void solve(int argc, char** argv);
-void interpretator(FILE* input_file, FILE* log_file);
+error_code_t interpretator(FILE* input_file, FILE* log_file);
 
 
 #endif

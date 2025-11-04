@@ -1,27 +1,6 @@
 #include "../include/dijkstra.h"
 
 
-Token define_token(const char c) {
-    int n = 6;
-    char operators[] = "+-*/^~";
-    for (int i = 0; i < n; ++i) {
-        if (c == operators[i]) {
-            return OPERATOR;
-        }
-    }
-
-    if ((c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) {
-        return OPERAND;
-    }
-    if (c == ')') {
-        return OPEN_BRACKET;
-    }
-    if (c == '(') {
-        return CLOSE_BRACKET;
-    }
-    return UNKNOWN;
-}
-
 
 int define_priority(const char c) {
     if (c == '+' || c == '-') {
@@ -36,7 +15,7 @@ int define_priority(const char c) {
     else if (c == '~') {
         return 4;
     }
-    return -1;
+    return -1; // в стеке открытая скобка, ее выталкивать не надо
 }
 
 Associativity define_associativity(const char operator) {
@@ -46,51 +25,58 @@ Associativity define_associativity(const char operator) {
     return LEFT_ASSOCIATIVITY;
 }
 
-bool define_pop(const char operator_1, const char operator_2) {
-    Associativity associativity = define_associativity(operator_1);
+bool define_pop(const Element operator_1, const Element operator_2) {
+    // operator_1 - новый элемент
+    // operator_2 - элемент с вершины стека
+    // выталкиваем, если operator_2 >= (>) operator_1
+    // то есть выталкиваем все операторы, у которых приоритет больше или равен (больше) чем у нового оператор  
+    Associativity associativity = define_associativity(operator_1.value.char_value);
     if (associativity == LEFT_ASSOCIATIVITY) {
-        return define_priority(operator_1) >= define_priority(operator_2);
+        return define_priority(operator_2.value.char_value) >= define_priority(operator_1.value.char_value);
     }
     else {
-        return define_priority(operator_1) > define_priority(operator_2);
+        return define_priority(operator_2.value.char_value) > define_priority(operator_1.value.char_value);
     }
 }
 
 
-void parse_expression(char *str_expression, LinkedList_char *output_queue) {
+error_code_t parse_expression(LinkedList_Element *input_queue, LinkedList_Element *output_queue) {
     State state = EXPECTED_OPERAND;
 
-    int index = 0;
-    char c = str_expression[index++];
+    LinkedList_Element stack = create_list_stack_queue(); // создаем стэк для хранения операторов
 
-    LinkedList_char stack = create_list_stack_queue();
+    while (input_queue->size != 0) {
+        Element element = peek_queue_Element(input_queue); // берем очередной элемент во входной очереди
+        dequeue_Element(input_queue); // удаляем из входной очереди
 
-    while (c != '\0') {
-        Token token = define_token(c);
+        Token token = element.token; // обрабатываем токен
         switch (state) {
             case (EXPECTED_OPERAND):
                 // ожидаем либо операнд, либо открывающую скобку, либо унарный минус
-                if (token == OPERAND) {
+                if (token == VARIABLE || token == NUMBER) {
                     // если операнд, то однозначно добавляем его в выходную очередь
-                    enqueue_char(output_queue, c);
+                    enqueue_Element(output_queue, element);
                     
                     // если это операнд, то меняем состояние, так как теперь мы ожидаем операцию
                     state = EXPECTED_OPERATOR;
                 }
                 else if (token == OPEN_BRACKET) {
                     // если это открывающая скобка, то добавляем ее в стэк
-                    push_stack_char(&stack, c);
+                    push_stack_Element(&stack, element);
                 }
-                else if (c == '-') {
+                else if (element.token == OPERATOR && element.value.char_value == '-') {
                     // это унарный минус
                     // добавляем его в стэк
                     // обозначаем унарный минус в виде ~
-                    push_stack_char(&stack, '~'); 
+                    Element new_element;
+                    new_element.token = OPERATOR;
+                    new_element.value.char_value = '~'; // меняем унарный минус на ~
+                    push_stack_Element(&stack, new_element); 
                 }
 
                 else {
                     printf("-- Ошибка в выражении\n");
-                    return;
+                    return ERROR_WITH_EXPRESSION;
                 }
 
                 break;
@@ -98,49 +84,45 @@ void parse_expression(char *str_expression, LinkedList_char *output_queue) {
             case (EXPECTED_OPERATOR):
                 // ожидаем бинарный оператор или закрывающая скобку
                 if (token == OPERATOR) {
-                    if (stack.size != 0) { 
-                        char top_stack;
-                        do {
-                            top_stack = peek_stack_char(&stack); // получаем оператор с вершины стека
+                    while (stack.size > 0 && define_pop(element, peek_stack_Element(&stack)))  {
+                        Element top_stack = peek_stack_Element(&stack); // получаем оператор с вершины стека
 
-                            pop_stack_char(&stack); // удаляем операцию со стека операций
-                            enqueue_char(output_queue, top_stack); // добавляем операцию в выходную очередь
-
-                        } while (stack.size > 0 && define_pop(c, top_stack));
-                    }
+                        pop_stack_Element(&stack); // удаляем операцию со стека операций
+                        enqueue_Element(output_queue, top_stack); // добавляем операцию в выходную очередь
+                    } 
                     
-                    push_stack_char(&stack, c); // добавляем операцию в стек
+                    push_stack_Element(&stack, element); // добавляем операцию в стек
 
                     state = EXPECTED_OPERAND;
                 }
 
                 else if (token == CLOSE_BRACKET) {
                     if (stack.size != 0) {
-                        char top_stack = peek_stack_char(&stack); // вершина стэка
+                        Element top_stack = peek_stack_Element(&stack); // вершина стэка
 
-                        while (top_stack != '(') {
-                            pop_stack_char(&stack); // удаляем эту операцию
-                            enqueue_char(output_queue, top_stack); // перекладываем в выходную очередь
+                        while (top_stack.value.char_value != '(') {
+                            pop_stack_Element(&stack); // удаляем эту операцию
+                            enqueue_Element(output_queue, top_stack); // перекладываем в выходную очередь
 
-                            top_stack = peek_stack_char(&stack); // вершина стэка
+                            top_stack = peek_stack_Element(&stack); // вершина стэка
 
-                            if (stack.size == 0 && top_stack != '(') { // если стэк закончился, а открывающей скобки нет
+                            if (stack.size == 0 && top_stack.value.char_value != '(') { // если стэк закончился, а открывающей скобки нет
                                 printf("-- Ошибка в выражении\n");
-                                return;
+                                return ERROR_WITH_EXPRESSION;
                             }
                         }
-                        pop_stack_char(&stack); // удаляем открывающую скобку и никуда ее не добавляем
+                        pop_stack_Element(&stack); // удаляем открывающую скобку и никуда ее не добавляем
                     }   
 
                     else {
                         printf("-- Ошибка в выражении\n");
-                        return;
+                        return ERROR_WITH_EXPRESSION;
                     } 
                 }
 
                 else {
                     printf("-- Ошибка в выражении\n");
-                    return;
+                    return ERROR_WITH_EXPRESSION;
                 }
 
                 break;
@@ -148,21 +130,20 @@ void parse_expression(char *str_expression, LinkedList_char *output_queue) {
             
             default:
                 printf("-- Ошибка в выражении\n");
-                return;
+                return ERROR_WITH_EXPRESSION; 
         }
-
-        c = str_expression[index++];
     }
 
     // если что то осталось в стеке, перекладываем
     while (stack.size != 0) {
-        char top_stack = peek_stack_char(&stack);
-        if (top_stack == '(') {
+        Element top_stack = peek_stack_Element(&stack);
+        if (top_stack.token == OPEN_BRACKET) {
             printf("-- Ошибка в выражении\n");
-            return;
+            return ERROR_WITH_EXPRESSION;
         }
-        pop_stack_char(&stack);
+        pop_stack_Element(&stack);
 
-        enqueue_char(output_queue, top_stack);
+        enqueue_Element(output_queue, top_stack);
     }
+    return SUCCESS;
 }

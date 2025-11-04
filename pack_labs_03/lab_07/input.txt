@@ -1,1 +1,16 @@
-A=3+5
+D = -5 + -(-(3 * (-4)))
+PRINT ( D )
+A = 3
+B=2
+PRINT(A)
+PRINT(-------A)
+PRINT(B)
+PRINT(A^A^B)
+PRINT(A^(A^B))
+PRINT((A^A)^B)
+PRINT(A)
+A=A*2
+PRINT(A)
+PRINT((-(-5*-1))^2-4/2)
+PRINT((-1)^2)
+PRINT((-1)^3)

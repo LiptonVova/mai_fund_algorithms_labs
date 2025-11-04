@@ -13,20 +13,13 @@ typedef enum {
     EXPECTED_OPERATOR, // ожидаем операцию или закрывающую скобку
 } State;
 
-typedef enum {
-    UNKNOWN,
-    OPERAND,
-    OPERATOR,
-    OPEN_BRACKET,
-    CLOSE_BRACKET,
-} Token;
 
 typedef enum {
     LEFT_ASSOCIATIVITY,
     RIGHT_ASSOCIATIVITY,
 } Associativity;
 
-void parse_expression(char *str_expression, LinkedList_char *output_queue);
+error_code_t parse_expression(LinkedList_Element *input_queue, LinkedList_Element *output_queue);
 
 
 
