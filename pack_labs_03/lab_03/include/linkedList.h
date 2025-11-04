@@ -191,27 +191,27 @@ static inline void delete_list_##LIST_TYPE(LinkedList_##LIST_TYPE *list) { \
 /* ----------------- СТЕК ----------------- */ \
 /* Поместить элемент на вершину стека */ \
 static inline void push_stack_##LIST_TYPE(LinkedList_##LIST_TYPE *stack, LIST_TYPE value) { \
-    push_back_list_##LIST_TYPE(stack, value); \
+    push_front_list_##LIST_TYPE(stack, value); \
 } \
 /* Извлечь элемент с вершины стека */ \
 static inline void pop_stack_##LIST_TYPE(LinkedList_##LIST_TYPE *stack) { \
-    pop_back_list_##LIST_TYPE(stack); \
+    pop_front_list_##LIST_TYPE(stack); \
 } \
 /* Получить элемент с вершины стека без удаления */ \
 static inline LIST_TYPE peek_stack_##LIST_TYPE(const LinkedList_##LIST_TYPE *stack) { \
     if (stack->size > 0) { \
-        return stack->tail->data; \
+        return stack->head->data; \
     } \
     return stack->DefaultValues(); \
 } \
 /* ---------------- ОЧЕРЕДЬ ----------------- */ \
 /* Добавить элемент в очередь */ \
 static inline void enqueue_##LIST_TYPE(LinkedList_##LIST_TYPE *queue, LIST_TYPE value) { \
-    push_front_list_##LIST_TYPE(queue, value); \
+    push_back_list_##LIST_TYPE(queue, value); \
 } \
 /* Извлечь элемент из очереди */ \
 static inline void dequeue_##LIST_TYPE(LinkedList_##LIST_TYPE *queue) { \
-    pop_back_list_##LIST_TYPE(queue); \
+    pop_front_list_##LIST_TYPE(queue); \
 } \
 /* Получить первый элемент очереди без удаления */ \
 static inline LIST_TYPE peek_queue_##LIST_TYPE(const LinkedList_##LIST_TYPE *queue) { \

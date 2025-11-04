@@ -187,27 +187,27 @@ void delete_list(LinkedList *list) { \
 /* ----------------- СТЕК ----------------- */ \
 /* Поместить элемент на вершину стека */ \
 void push_stack(LinkedList *stack, LIST_TYPE value) { \
-    push_back_list(stack, value); \
+    push_front_list(stack, value); \
 } \
 /* Извлечь элемент с вершины стека */ \
 void pop_stack(LinkedList *stack) { \
-    pop_back_list(stack); \
+    pop_front_list(stack); \
 } \
 /* Получить элемент с вершины стека без удаления */ \
 LIST_TYPE peek_stack(const LinkedList *stack) { \
     if (stack->size > 0) { \
-        return stack->tail->data; \
+        return stack->head->data; \
     } \
     return (LIST_TYPE)0; \
 } \
 /* ---------------- ОЧЕРЕДЬ ----------------- */ \
 /* Добавить элемент в очередь */ \
 void enqueue(LinkedList *queue, LIST_TYPE value) { \
-    push_front_list(queue, value); \
+    push_back_list(queue, value); \
 } \
 /* Извлечь элемент из очереди */ \
 void dequeue(LinkedList *queue) { \
-    pop_back_list(queue); \
+    pop_front_list(queue); \
 } \
 /* Получить первый элемент очереди без удаления */ \
 LIST_TYPE peek_queue(const LinkedList *queue) { \

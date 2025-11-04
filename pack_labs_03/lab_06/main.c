@@ -3,7 +3,7 @@
 
 
 int main() {
-    const char buffer[1000];
+    char buffer[1000];
     printf("Введите строчку, которую надо првоерить на вложенность скобок:\n");
     scanf("%s", buffer);
 
