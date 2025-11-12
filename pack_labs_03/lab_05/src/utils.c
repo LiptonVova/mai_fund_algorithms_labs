@@ -1,0 +1,210 @@
+#include "../include/utils.h"
+
+
+error_code_t create_input_output_files(FILE **input, FILE **output, int argc, char *argv[]) {
+    *input = fopen(argv[1], "r");
+    if (!(*input)) {
+        printf("-- ошибка: ошибка при открытии файла %s", argv[1]);
+        print_usage();
+        return ERROR_FILE_OPEN;
+    }
+
+    char output_name[100];
+    if (argc == 3) {
+        strcpy(output_name, argv[2]);
+    }
+    else {
+        srand(time(NULL));
+
+        const int count_symbols = 1 + (rand() % 10); // колво символов в выходном файле
+        
+        int i = 0;
+        for ( ; i < count_symbols; ++i) {
+            output_name[i] = 'a' + (rand() % 26);
+        }
+        output_name[i] = '\0';
+        strcat(output_name, ".txt");
+    }
+
+    *output = fopen(output_name, "w");
+    if (!(*output)) {
+        printf("-- ошибка: ошибка при открытии файла %s", output_name);
+        print_usage();
+        return ERROR_FILE_OPEN;
+    }
+
+    return SUCCESS;
+}
+
+error_code_t read_data_from_input_file(PostOffice *post_offices, bool *work_post_offices, FILE *input_file) {
+    unsigned int sender = 0, receiver = 0;
+    while (!feof(input_file)) {
+        fscanf(input_file, "%d-%d", &sender, &receiver);
+
+        error_code_t error = validate_link_sender_receiver(sender, receiver, post_offices, work_post_offices);
+        if (error == ERROR_POST_OFFICE_NOT_EXIST || error == ERROR_FORMAT_DATA) return error;
+
+        // создаю двунаправленное соединение
+        post_offices[sender].links[receiver] = true;
+        post_offices[receiver].links[sender] = true;
+    }
+    return SUCCESS;
+}
+
+
+void print_usage() {
+    printf("./main.out input_file [log_file]\n");
+}
+
+void print_info() {
+    printf("Доступные команды: \n");
+    printf("\t1. Добавить почтовое отделение\n");
+    printf("\t2. Удалить почтовое отделение\n");
+    printf("\t3. Добавить письмо\n");
+    printf("\t4. Попытка взять письмо из пункта назначения\n");
+    printf("\t5. Вывести все письма\n");
+    printf("\t6. Запустить процесс отправки писем\n");
+    printf("\t7. Считать данные (связи между отделениями) из файла\n");
+    printf("\t8. Выход из приложения\n");
+}
+
+void print_letter(Letter *letter) {
+    printf("== Письмо id %u\n", letter->id);
+    printf("\tТип письма: ");
+    switch (letter->type) {
+        case (SIMPLE) : {
+            printf("Простое\n");
+            break;
+        }
+        case (URGENT) : {
+            printf("Срочное\n");
+            break;
+        }
+    }
+
+    printf("\tСостояние письма: ");
+    switch (letter->state) {
+        case (DELIVERED) : {
+            printf("Доставлено\n");
+            break;
+        }
+        case (NOT_DELIVERED) : {
+            printf("Недоставлено\n");
+            break;
+        }
+        case (IN_THE_PROCCESS_OF_SENDING) : {
+            printf("В процессе доставки\n");
+            break;
+        }
+    }
+
+    printf("\tПриоритет письма: %d\n", letter->priority);
+    printf("\tid почтового отделения отправителя: %u\n", letter->id_postoffice_sender);
+    printf("\tid почтового отделения получателя: %u\n", letter->id_postoffice_receiver);
+    printf("\tТехнические данные: %s\n", letter->tech_data);
+}
+
+void print_all_letters(Vector_LetterPtr *vector_all_letters) {
+    for (int i = 0; i < vector_all_letters->size; ++i) {
+        print_letter(get_at_vector_LetterPtr(vector_all_letters, i));
+    }
+}
+
+
+void bfs(PostOffice *post_offices, bool *work_post_offices, unsigned int start_position, int *distance) {
+    LinkedList_size_t queue = create_linked_list_stack_queue_impl();
+
+    enqueue_size_t(&queue, start_position);
+
+    distance[start_position] = 0;
+    
+    while (queue.size != 0) {
+        unsigned int v = peek_queue_size_t(&queue); // индекс почтового отделения, в которое сейчас переходим
+        dequeue_size_t(&queue);
+
+        bool *links = post_offices[v].links;
+        for (int i = 0; i < MAX_SIZE_POST_OFFICES; ++i) {
+            if (validate_work_post_office(post_offices, work_post_offices, links, distance, i) == false) {
+                // если у нас нет с ним связи или
+                // его не существует, переполнено или мы его уже посещали
+                continue;
+            }
+            distance[i] = distance[v] + 1;
+            enqueue_size_t(&queue, i);
+        }
+    }
+}
+
+
+bool move_max_priority_letter_from_postoffice(PostOffice *post_offices, bool *work_post_offices, unsigned int id_post_office, FILE *output_file) {
+    // с какими отделениями есть связь
+    bool *links = post_offices[id_post_office].links;
+
+    Vector_LetterPtr vector_letters = create_vector_impl();
+
+    // письмо с максимальным приоритетом
+    Letter *max_letter = NULL;
+    while (post_offices[id_post_office].letters.size != 0 ) {
+        Letter *letter = pop_heap_LetterPtr(&post_offices[id_post_office].letters);
+        push_back_vector_LetterPtr(&vector_letters, letter);
+        if (letter->state == IN_THE_PROCCESS_OF_SENDING) {
+            max_letter = letter;
+            break;
+        }
+        
+    }
+
+    int vector_size = vector_letters.size;
+    while (vector_size != 0) {
+        Letter *letter = get_at_vector_LetterPtr(&vector_letters, vector_size - 1);
+        delete_at_vector_LetterPtr(&vector_letters, vector_size - 1);
+
+        // возвращаем обратно
+        push_heap_LetterPtr(&post_offices[id_post_office].letters, letter);
+        --vector_size; 
+    }
+
+    if (max_letter == NULL) {
+        // все письма в этом отделении уже доставлены
+        return false;
+    }
+
+
+    unsigned int id_receiver_post_office = max_letter->id_postoffice_receiver;
+
+    unsigned int id_next_post_office = MAX_SIZE_POST_OFFICES + 1;
+    int min_distance = INT_MAX;
+
+    for (int next_id = 0; next_id < MAX_SIZE_POST_OFFICES; ++next_id) {
+        // если его не существует или нет связи
+        if (work_post_offices[next_id] == false || links[next_id] == false) continue;
+        // массив, где будут хранится расстояния от почтового отделения с индексом next_id
+        // до итового почтового отделения
+        int distance[MAX_SIZE_POST_OFFICES];
+        for (int i = 0; i < MAX_SIZE_POST_OFFICES; ++i) {
+            distance[i] = -1;
+        }
+
+        bfs(post_offices, work_post_offices, next_id, distance);
+        
+        if (distance[id_receiver_post_office] < min_distance) {
+            min_distance = distance[id_receiver_post_office];
+            id_next_post_office = next_id;
+        }
+    }
+
+
+    // если не нашли куда можно отправить письмо
+    // нет дорог между отделениями, нет свободных отделений
+    if (id_next_post_office == MAX_SIZE_POST_OFFICES + 1) {
+        return false;
+    }
+
+    if (id_next_post_office == id_receiver_post_office) {
+        max_letter->state = DELIVERED;
+    }
+    
+    pop_heap_LetterPtr(&post_offices[id_post_office].letters);
+    push_heap_LetterPtr(&(post_offices[id_next_post_office].letters), max_letter);
+    return true;
+} 
