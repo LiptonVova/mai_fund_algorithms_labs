@@ -1,8 +1,22 @@
 #include "../include/core.h"
 
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-error_code_t start_interactive_console(PostOffice *post_offices, bool *work_post_offices, FILE *input_file, \
-                                        FILE *output_file, Vector_LetterPtr* vector_all_letters) {
+void* handle_start_sending(void *args) {
+    ThreadArgs *thread_args = (ThreadArgs*)args;
+    while (true) {
+        for (unsigned int i = 0; i < MAX_SIZE_POST_OFFICES; ++i) {
+            if (thread_args->work_post_offices[i] == true) {
+                move_max_priority_letter_from_postoffice(thread_args->post_offices, thread_args->work_post_offices, i, thread_args->output_file);
+            }
+        }
+        sleep(0.2);
+    }
+    return NULL;
+}
+
+void* start_interactive_console(void *args) {
+    ThreadArgs* thread_args = (ThreadArgs*)args;
     printf("-- инфо: запускается консоль взаимодействия для домохозяек с моей программой\n");
 
     printf("Добро пожаловать в почту Вовы Рыбина!\n");
@@ -15,33 +29,34 @@ error_code_t start_interactive_console(PostOffice *post_offices, bool *work_post
         
         switch (choice) {
             case (ADD_POSTOFFICE): {
-                error = handle_add_postoffice(post_offices, work_post_offices, output_file); 
+                error = handle_add_postoffice(thread_args->post_offices, thread_args->work_post_offices, thread_args->output_file);
+                if (error != SUCCESS) return NULL;
                 break;
             }
             case (DELETE_POSTOFFICE): {
-                error = handle_delete_postoffice(post_offices, work_post_offices, output_file);
+                error = handle_delete_postoffice(thread_args->post_offices, thread_args->work_post_offices, thread_args->output_file);
+                if (error != SUCCESS) return NULL;
                 break;
             }
             case (ADD_LETTER): {
-                error = handle_add_letter(post_offices, work_post_offices, output_file, vector_all_letters);
+                error = handle_add_letter(thread_args->post_offices, thread_args->work_post_offices, thread_args->output_file, thread_args->vector_all_letters);
+                if (error != SUCCESS) return NULL;
                 break;
             }
             case (GET_LETTER): {
-                handle_get_letter(work_post_offices, vector_all_letters, output_file);
+                handle_get_letter(thread_args->work_post_offices, thread_args->vector_all_letters, thread_args->output_file);
+                if (error != SUCCESS) return NULL;
                 break;
             }
             case (PRINT_ALL_LETTERS): {
-                print_all_letters(vector_all_letters);
-                break;
-            }
-            case (START_SENDING): {
-                handle_start_sending(post_offices, work_post_offices, output_file);
+                print_all_letters(thread_args->vector_all_letters); 
+                if (error != SUCCESS) return NULL;
                 break;
             }
             case (READ_DATA_FROM_INPUT_FILE): {
                 // считать данные из файла
-                error = read_data_from_input_file(post_offices, work_post_offices, input_file);
-                if (error != SUCCESS) return error;
+                error = read_data_from_input_file(thread_args->post_offices, thread_args->work_post_offices, thread_args->input_file);
+                if (error != SUCCESS) return NULL;
                 break;
             }
             case (EXIT): {
@@ -55,9 +70,8 @@ error_code_t start_interactive_console(PostOffice *post_offices, bool *work_post
         }
     } while (choice != EXIT);
 
-    return SUCCESS;
+    return NULL;
 }
-
 
 void start_mail_application(int argc, char *argv[]) {
     // валидация входных данных
@@ -77,5 +91,19 @@ void start_mail_application(int argc, char *argv[]) {
     bool work_post_offices[MAX_SIZE_POST_OFFICES]; // массив, в котором помечены работающие и неработающие отделения
     Vector_LetterPtr vector_all_letters = create_vector_impl(); // вектор всех писем
 
-    error = start_interactive_console(post_offices, work_post_offices, input_file, output_file, &vector_all_letters);
+    pthread_t interaction_with_user, sending_letters;
+
+    ThreadArgs args;
+    args.post_offices = post_offices;
+    args.work_post_offices = work_post_offices;
+    args.input_file = input_file;
+    args.vector_all_letters = &vector_all_letters;
+
+    pthread_create(&interaction_with_user, NULL, start_interactive_console, &args);
+    pthread_create(&sending_letters, NULL, handle_start_sending, &args);
+
+    pthread_join(interaction_with_user, NULL);
+    pthread_join(sending_letters, NULL);
+
+    pthread_mutex_destroy(&mutex);
 }

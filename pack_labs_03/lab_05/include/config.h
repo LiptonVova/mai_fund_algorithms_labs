@@ -66,9 +66,8 @@ typedef enum {
     ADD_LETTER = 3,
     GET_LETTER = 4,
     PRINT_ALL_LETTERS = 5,
-    START_SENDING = 6,
-    READ_DATA_FROM_INPUT_FILE = 7,
-    EXIT = 8,
+    READ_DATA_FROM_INPUT_FILE = 6,
+    EXIT = 7,
 } Choice;
 
 

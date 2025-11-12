@@ -173,16 +173,3 @@ void handle_get_letter(bool *work_post_offices, Vector_LetterPtr *vector_all_let
     printf("Вы успешно забрали письмо!\n");
     cur_letter->taked = true;
 }
-
-void handle_start_sending(PostOffice *post_offices, bool *work_post_offices, FILE *output_file) {
-    bool is_changed = true;
-    while (is_changed == true) {
-        is_changed = false;
-        for (unsigned int i = 0; i < MAX_SIZE_POST_OFFICES; ++i) {
-            if (work_post_offices[i] == true) {
-                bool flag = move_max_priority_letter_from_postoffice(post_offices, work_post_offices, i, output_file);
-                if (flag == true) is_changed = true;
-            }
-        }
-    }
-}
