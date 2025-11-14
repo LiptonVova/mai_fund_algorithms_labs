@@ -5,35 +5,17 @@
 [service interactive with user]: было добавлено новое почтовое отделение: Почтовое отделение 2
 				Имеет связь со следующими отделениями: 1
 				Максимальная вместимость почтового отделения: 1
-[service interactive with user]: было добавлено новое почтовое отделение: Почтовое отделение 3
-				Имеет связь со следующими отделениями: 2
-				Максимальная вместимость почтового отделения: 1
 [service sending letter]: в отделении 1 нет доступных писем
 [service sending letter]: в отделении 2 нет доступных писем
-[service sending letter]: в отделении 3 нет доступных писем
+[service interactive with user]: Было добавлено письмо 0
+				Приоритет: 1
+				Тип письма: простое
+				Техническая информация: vova
+[service sending letter]: письмо 0 было отправлено из почтового отделения 1 в почтовое отделение 2
+[service sending letter]: в отделении 2 нет доступных писем
 [service interactive with user]: Было добавлено письмо 1
 				Приоритет: 1
 				Тип письма: простое
 				Техническая информация: vova
-
-[service sending letter]: письмо 0 было отправлено из почтового отделения 1 в почтовое отделение 2
-[service sending letter]: письмо 0 было отправлено из почтового отделения 2 в почтовое отделение 3
-[service sending letter]: в отделении 3 нет доступных писем
 [service sending letter]: в отделении 1 нет доступных писем
-[service sending letter]: в отделении 2 нет доступных писем
-[service sending letter]: в отделении 3 нет доступных писем
-[service sending letter]: в отделении 1 нет доступных писем
-[service sending letter]: в отделении 2 нет доступных писем
-[service sending letter]: в отделении 3 нет доступных писем
-[service sending letter]: в отделении 1 нет доступных писем
-[service sending letter]: в отделении 2 нет доступных писем
-[service sending letter]: в отделении 3 нет доступных писем
-[service sending letter]: в отделении 1 нет доступных писем
-[service sending letter]: в отделении 2 нет доступных писем
-[service sending letter]: в отделении 3 нет доступных писем
-[service sending letter]: в отделении 1 нет доступных писем
-[service sending letter]: в отделении 2 нет доступных писем
-[service sending letter]: в отделении 3 нет доступных писем
-[service sending letter]: в отделении 1 нет доступных писем
-[service sending letter]: в отделении 2 нет доступных писем
-[service sending letter]: в отделении 3 нет доступных писем
+[service sending letter]: письмо 1 было отправлено из почтового отделения 2 в почтовое отделение 1

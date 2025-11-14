@@ -82,6 +82,18 @@ error_code_t validate_delete_id_postoffice(const bool *work_post_offices, const 
     return SUCCESS;
 }
 
+error_code_t validate_id_postoffice_for_add_letter(PostOffice *post_offices, bool *work_post_offices, unsigned int id_sender) {
+    error_code_t error = validate_delete_id_postoffice(work_post_offices, id_sender);
+    if (error != SUCCESS) return error;
+
+    if (post_offices[id_sender].letters.size == post_offices[id_sender].capacity_post_office) {
+        printf("-- варнинг: это почтовое отделение переполнено\n");
+        return WARNING_ID_POST_OFFICE_FOR_ADD_LETTER;
+    }
+
+    return SUCCESS;
+}
+
 error_code_t validate_type_letter(TypeLetter type_letter) {
     if (type_letter != SIMPLE && type_letter != URGENT) return WARNING_TYPE_LETTER;
     return SUCCESS;

@@ -22,6 +22,7 @@ typedef enum {
     WARNING_ID_POST_OFFICE,
     WARNING_LINK_POST_OFFICES,
     WARNING_TYPE_LETTER,
+    WARNING_ID_POST_OFFICE_FOR_ADD_LETTER,
 } error_code_t;
 
 typedef enum {

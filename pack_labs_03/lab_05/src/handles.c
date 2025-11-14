@@ -148,7 +148,7 @@ error_code_t handle_add_letter(PostOffice *post_offices, bool *work_post_offices
     do {
         printf("Введите id почтового отделения отправителя: ");
         scanf("%u", &id_sender);
-        error = validate_delete_id_postoffice(work_post_offices, id_sender);
+        error = validate_id_postoffice_for_add_letter(post_offices, work_post_offices, id_sender);
         if (error != SUCCESS) printf("-- варнинг: невалидный id отправителя, попробуйте еще раз\n");
     }
     while (error != SUCCESS);
@@ -179,13 +179,13 @@ error_code_t handle_add_letter(PostOffice *post_offices, bool *work_post_offices
     push_heap_LetterPtr(&post_offices[id_sender].letters, letter);
     push_back_vector_LetterPtr(vector_all_letters, letter);
 
-    fprintf(output_file, "[service interactive with user]: Было добавлено письмо %u\n", static_id_letter);
+    fprintf(output_file, "[service interactive with user]: Было добавлено письмо %u\n", letter->id);
     fprintf(output_file, "\t\t\t\tПриоритет: %d\n", letter->priority);
     fprintf(output_file, "\t\t\t\tТип письма: ");
     if (letter->type == SIMPLE) fprintf(output_file, "простое\n");
     if (letter->type == URGENT) fprintf(output_file, "срочное\n");
 
-    fprintf(output_file, "\t\t\t\tТехническая информация: %s\n", letter->tech_data);
+    fprintf(output_file, "\t\t\t\tТехническая информация: %s", letter->tech_data);
 
     fflush(output_file);
     pthread_mutex_unlock(mutex_data);
