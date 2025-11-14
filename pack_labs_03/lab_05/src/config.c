@@ -5,8 +5,8 @@ void delete_func(Letter* value) {
 }
 
 int comp(Letter* value_1, Letter* value_2) {
-    if (value_1->id < value_2->id) return -1;
-    else if (value_1->id > value_2->id) return 1;
+    if (value_1->priority < value_2->priority) return -1;
+    else if (value_1->priority > value_2->priority) return 1;
     return 0;
 }
 

@@ -136,4 +136,7 @@ void start_mail_application(int argc, char *argv[]) {
     pthread_join(sending_letters, NULL);
 
     pthread_mutex_destroy(&mutex_data);
+
+    fclose(input_file);
+    fclose(output_file);
 }

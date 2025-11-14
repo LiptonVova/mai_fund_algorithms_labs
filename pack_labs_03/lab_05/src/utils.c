@@ -244,19 +244,31 @@ bool move_letter(PostOffice *post_offices, bool *work_post_offices, unsigned int
         // до итового почтового отделения
         int distance[MAX_SIZE_POST_OFFICES];
         for (int i = 0; i < MAX_SIZE_POST_OFFICES; ++i) {
-            distance[i] = -1;
+            distance[i] = INT_MAX - 1;
         }
 
         bfs(post_offices, work_post_offices, next_id, distance);
+        
+        // if (min_distance == -1 && distance[id_receiver_post_office] != -1) {
+        //     min_distance = distance[id_receiver_post_office];
+        //     id_next_post_office = next_id;
+        // }
+        // else if (distance[id_receiver_post_office] < min_distance && distance[id_receiver_post_office] != -1) {
+        //     min_distance = distance[id_receiver_post_office];
+        //     id_next_post_office = next_id;
+        // }
+        // else if (distance[id_receiver_post_office] == -1) {
+        //     min_distance = distance[id_receiver_post_office];
+        //     id_next_post_office = next_id;
+        // }
         
         if (distance[id_receiver_post_office] < min_distance) {
             min_distance = distance[id_receiver_post_office];
             id_next_post_office = next_id;
         }
-        else if (min_distance == -1) {
-            min_distance = distance[id_receiver_post_office];
-            id_next_post_office = next_id;
-        }
+
+
+
     }
 
 

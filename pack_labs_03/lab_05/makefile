@@ -1,7 +1,7 @@
 FLAGS = -g -Wall -pthread
 OBJ = main.o config.o core.o utils.o validate.o handles.o
 
-all: main.out
+all: main.out test_binary_heap_int.out
 
 clean: 
 	rm -rf *.o *.out
@@ -26,3 +26,6 @@ validate.o: src/validate.c
 
 handles.o: src/handles.c
 	gcc src/handles.c $(FLAGS) -c -o handles.o 
+
+test_binary_heap_int.out: test_binary_heap_int.c 
+	gcc test_binary_heap_int.c $(FLAGS) -o test_binary_heap_int.out

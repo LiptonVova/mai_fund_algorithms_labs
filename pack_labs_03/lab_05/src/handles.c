@@ -110,7 +110,7 @@ error_code_t handle_delete_postoffice(PostOffice *post_offices, bool *work_post_
             letter->state = NOT_DELIVERED;
         }
 
-        else if (letter->id_cur_postoffice == id_post_office) {
+        else if (letter->id_cur_postoffice == id_post_office && letter->taked == false) {
             // Письма, не связанные с этим отделением, отправляются в другие
             // отделения
 
