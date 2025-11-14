@@ -27,8 +27,8 @@ void print_info();
 
 void print_usage();
 
-void print_letter(Letter *letter);
-void print_all_letters(Vector_LetterPtr *vector_all_letters, pthread_mutex_t *mutex_data);
+void print_letter(FILE *output_file, Letter *letter);
+void print_all_letters(Vector_LetterPtr *vector_all_letters, FILE *output_file, pthread_mutex_t *mutex_data);
 
 void log_in_file_send_letter(FILE *output_file, unsigned int letter_id, unsigned int id_from, unsigned int id_to);
 

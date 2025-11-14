@@ -60,7 +60,7 @@ void* start_interactive_console(void *args) {
                 break;
             }
             case (PRINT_ALL_LETTERS): {
-                print_all_letters(thread_args->vector_all_letters, thread_args->mutex_data); 
+                print_all_letters(thread_args->vector_all_letters, thread_args->output_file, thread_args->mutex_data); 
                 break;
             }
             case (CHANGE_STATE_LETTER_TO_NOT_DELIVERED): {

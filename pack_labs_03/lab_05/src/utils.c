@@ -97,46 +97,49 @@ void print_info() {
     printf("\t8. Выход из приложения\n");
 }
 
-void print_letter(Letter *letter) {
-    printf("== Письмо id %u\n", letter->id);
-    printf("\tТип письма: ");
+void print_letter(FILE *output_file, Letter *letter) {
+    fprintf(output_file, "== Письмо id %u\n", letter->id);
+    fprintf(output_file, "\tТип письма: ");
     switch (letter->type) {
         case (SIMPLE) : {
-            printf("Простое\n");
+            fprintf(output_file, "Простое\n");
             break;
         }
         case (URGENT) : {
-            printf("Срочное\n");
+            fprintf(output_file, "Срочное\n");
             break;
         }
     }
 
-    printf("\tСостояние письма: ");
+    fprintf(output_file, "\tСостояние письма: ");
     switch (letter->state) {
         case (DELIVERED) : {
-            printf("Доставлено\n");
+            fprintf(output_file, "Доставлено\n");
             break;
         }
         case (NOT_DELIVERED) : {
-            printf("Недоставлено\n");
+            fprintf(output_file, "Недоставлено\n");
             break;
         }
         case (IN_THE_PROCCESS_OF_SENDING) : {
-            printf("В процессе доставки\n");
+            fprintf(output_file, "В процессе доставки\n");
             break;
         }
     }
 
-    printf("\tПриоритет письма: %d\n", letter->priority);
-    printf("\tid почтового отделения отправителя: %u\n", letter->id_postoffice_sender);
-    printf("\tid почтового отделения получателя: %u\n", letter->id_postoffice_receiver);
-    printf("\tТехнические данные: %s\n", letter->tech_data);
+    fprintf(output_file, "\tПриоритет письма: %d\n", letter->priority);
+    fprintf(output_file, "\tid почтового отделения отправителя: %u\n", letter->id_postoffice_sender);
+    fprintf(output_file, "\tid почтового отделения получателя: %u\n", letter->id_postoffice_receiver);
+    fprintf(output_file, "\tТехнические данные: %s\n", letter->tech_data);
 }
 
-void print_all_letters(Vector_LetterPtr *vector_all_letters, pthread_mutex_t *mutex_data) {
+void print_all_letters(Vector_LetterPtr *vector_all_letters, FILE *output_file, pthread_mutex_t *mutex_data) {
     pthread_mutex_lock(mutex_data);
     for (int i = 0; i < vector_all_letters->size; ++i) {
-        print_letter(get_at_vector_LetterPtr(vector_all_letters, i));
+        if (i == 0) fprintf(output_file, "[service sending letter]: Все письма: \n");
+        print_letter(output_file, get_at_vector_LetterPtr(vector_all_letters, i));
+        fflush(output_file);
+        print_letter(stdout, get_at_vector_LetterPtr(vector_all_letters, i));
     }
     pthread_mutex_unlock(mutex_data);
 }
