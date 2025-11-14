@@ -200,8 +200,8 @@ void move_max_priority_letter_from_postoffice(PostOffice *post_offices, bool *wo
     int min_distance = INT_MAX;
 
     for (int next_id = 0; next_id < MAX_SIZE_POST_OFFICES; ++next_id) {
-        // если его не существует или нет связи
-        if (work_post_offices[next_id] == false || links[next_id] == false) continue;
+        // если его не существует, нет связи или переполнено
+        if (post_offices[next_id].letters.size >= post_offices[next_id].capacity_post_office || work_post_offices[next_id] == false || links[next_id] == false) continue;
         // массив, где будут хранится расстояния от почтового отделения с индексом next_id
         // до итового почтового отделения
         int distance[MAX_SIZE_POST_OFFICES];
@@ -225,9 +225,8 @@ void move_max_priority_letter_from_postoffice(PostOffice *post_offices, bool *wo
     // если не нашли куда можно отправить письмо
     // нет дорог между отделениями, нет свободных отделений
     if (id_next_post_office == MAX_SIZE_POST_OFFICES + 1) {
-        fprintf(output_file, "[service sending letter]: письмо %u из отделения %u \
-                не может быть перенаправлено в другое, ввиду недоступности/загруженности\n", \
-                max_letter->id, id_post_office);
+        fprintf(output_file, "[service sending letter]: письмо %u из отделения %u ", max_letter->id, id_post_office);
+        fprintf(output_file, "не может быть перенаправлено в другое, ввиду недоступности/загруженности\n");
         fflush(output_file);
         pthread_mutex_unlock(mutex_data);
         return;
