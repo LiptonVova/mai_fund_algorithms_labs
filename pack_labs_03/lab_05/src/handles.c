@@ -179,7 +179,7 @@ error_code_t handle_add_letter(PostOffice *post_offices, bool *work_post_offices
     push_heap_LetterPtr(&post_offices[id_sender].letters, letter);
     push_back_vector_LetterPtr(vector_all_letters, letter);
 
-    fprintf(output_file, "[service interactive with user]: Было добавлено письмо %u", static_id_letter);
+    fprintf(output_file, "[service interactive with user]: Было добавлено письмо %u\n", static_id_letter);
     fprintf(output_file, "\t\t\t\tПриоритет: %d\n", letter->priority);
     fprintf(output_file, "\t\t\t\tТип письма: ");
     if (letter->type == SIMPLE) fprintf(output_file, "простое\n");

@@ -2,32 +2,13 @@
 
 void* handle_start_sending(void *args) {
     ThreadArgs *thread_args = (ThreadArgs*)args;
-    Vector_BufferLetters vector_buffer = create_buffer_letters_impl(); // буффер, куда будут добавляться все перемещения писем
     while (*(thread_args->thread_live) == true) {
         for (unsigned int i = 0; i < MAX_SIZE_POST_OFFICES; ++i) {
             if (thread_args->work_post_offices[i] == true) {
                 move_max_priority_letter_from_postoffice(thread_args->post_offices, thread_args->work_post_offices, \
-                                                    i, &vector_buffer, thread_args->mutex_data);
+                                                    i, thread_args->output_file, thread_args->mutex_data);
             }
         }
-
-        pthread_mutex_lock(thread_args->mutex_data);
-        for (int i = 0; i < vector_buffer.size; ++i) {
-            BufferLetters buffer_letter = get_at_vector_BufferLetters(&vector_buffer, i);
-            unsigned int id_from = buffer_letter.id_post_office_from;
-            unsigned int id_to = buffer_letter.id_post_office_to;
-
-            pop_heap_LetterPtr(&(thread_args->post_offices[id_from].letters));
-            push_heap_LetterPtr(&(thread_args->post_offices[id_to].letters), buffer_letter.letter);
-            
-            log_in_file_send_letter(thread_args->output_file, buffer_letter.letter->id, id_from, id_to);
-        }
-        
-
-        pthread_mutex_unlock(thread_args->mutex_data);
-        
-        vector_buffer.size = 0;
-
         sleep(10);
     }
     return NULL;

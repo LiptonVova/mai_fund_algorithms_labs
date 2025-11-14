@@ -18,7 +18,7 @@ error_code_t read_data_from_input_file(PostOffice *post_offices, bool *work_post
 
 
 void move_max_priority_letter_from_postoffice(PostOffice *post_offices, bool *work_post_offices, \
-                                                unsigned int id_post_office, Vector_BufferLetters *buffer, pthread_mutex_t *mutex_data);
+                                                unsigned int id_post_office, FILE *output_file, pthread_mutex_t *mutex_data);
 
 void print_info();
 

@@ -4,8 +4,8 @@
 
 #include <stdlib.h>
 
-#define DEFINE_BINARY_MIN_HEAP(HEAP_TYPE) \
-/* Бинарная куча (минимальная по умолчанию) */ \
+#define DEFINE_BINARY_MAX_HEAP(HEAP_TYPE) \
+/* Максимальная бинарная куча */ \
 typedef struct { \
     HEAP_TYPE *data; /* массив элементов */ \
     size_t size; /* текущее количество элементов */ \
@@ -63,18 +63,18 @@ inline static void sift_down_##HEAP_TYPE(Heap_##HEAP_TYPE *h, const size_t index
     while (i * 2 + 1 < h->size) { /* пока есть потомки */ \
         size_t left_child = i * 2 + 1; /* индекс левого ребенка */ \
         size_t right_child = i * 2 + 2; /* индекс правого ребенка */ \
-        size_t smallest = i; /* здесь будет хранится индекс наименьшего ребенка */ \
-        if (h->comp(h->data[smallest], h->data[left_child]) == 1) { /* сравниваем с левым потомком*/ \
-            smallest = left_child; \
+        size_t biggest = i; /* здесь будет хранится индекс наибольшого ребенка */ \
+        if (h->comp(h->data[biggest], h->data[left_child]) == -1) { /* сравниваем с левым потомком*/ \
+            biggest = left_child; \
         } \
-        if (right_child < h->size && h->comp(h->data[smallest], h->data[right_child]) == 1 ) { /* сравниваем с правым потомком*/ \
-            smallest = right_child; \
+        if (right_child < h->size && h->comp(h->data[biggest], h->data[right_child]) == -1 ) { /* сравниваем с правым потомком*/ \
+            biggest = right_child; \
         } \
-        if (smallest == i) { /* значит структура кучи уже правильная (нашли место) */ \
+        if (biggest == i) { /* значит структура кучи уже правильная (нашли место) */ \
             break; \
         } \
-        h->swap(&h->data[smallest], &h->data[i]); /* просеиваем вниз */ \
-        i = smallest; \
+        h->swap(&h->data[biggest], &h->data[i]); /* просеиваем вниз */ \
+        i = biggest; \
     } \
 } \
 /* Просеивание вверх */ \
@@ -86,7 +86,7 @@ inline static void sift_up_##HEAP_TYPE(Heap_##HEAP_TYPE *h, const size_t index) 
     } \
     size_t i = index; \
     size_t parent = (i - 1) / 2; \
-    while (i > 0 && h->comp(h->data[i], h->data[parent]) == -1) { \
+    while (i > 0 && h->comp(h->data[i], h->data[parent]) == 1) { \
         /* пока потомок меньше чем родитель, проталкиваем вверх */ \
         h->swap(&(h->data[i]), &(h->data[parent])); \
         i = parent; \
@@ -114,7 +114,7 @@ inline static HEAP_TYPE pop_heap_##HEAP_TYPE(Heap_##HEAP_TYPE *h) { \
         return h->default_constructor(); \
     }\
     HEAP_TYPE pop_element = h->data[0]; \
-    h->swap(&h->data[0], &h->data[h->size - 1]); /* меняем минимальный элемент с последним элементом в куче */ \
+    h->swap(&h->data[0], &h->data[h->size - 1]); /* меняем максимальный элемент с последним элементом в куче */ \
     h->size--; /* уменьшаем размер кучи */ \
     sift_down_##HEAP_TYPE(h, 0); /* просеиваем вниз */ \
     return h->copy_func(pop_element);\

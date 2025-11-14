@@ -56,15 +56,8 @@ typedef struct {
     Heap_LetterPtr letters; // очередь с приоритетом с письмами
 } PostOffice;
 
-// структура, в которую сохраняются все перемещения писем, чтобы синхронизировать изменения
-typedef struct {
-    Letter *letter;
-    unsigned int id_post_office_from;
-    unsigned int id_post_office_to;
-} BufferLetters;
 
 DEFINE_VECTOR(LetterPtr)
-DEFINE_VECTOR(BufferLetters)
 // для bfs
 DEFINE_LIST_STACK_QUEUE(size_t)
 
@@ -80,8 +73,6 @@ typedef enum {
     EXIT = 7,
 } Choice;
 
-
-Vector_BufferLetters create_buffer_letters_impl();
 Vector_LetterPtr create_vector_impl();
 Heap_LetterPtr create_priority_queue_impl();
 LinkedList_size_t create_linked_list_stack_queue_impl();

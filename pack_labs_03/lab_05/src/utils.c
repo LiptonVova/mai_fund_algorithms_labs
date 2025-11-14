@@ -153,7 +153,7 @@ void bfs(PostOffice *post_offices, bool *work_post_offices, unsigned int start_p
 
 
 void move_max_priority_letter_from_postoffice(PostOffice *post_offices, bool *work_post_offices, \
-                                        unsigned int id_post_office, Vector_BufferLetters *buffer, pthread_mutex_t *mutex_data) {
+                                        unsigned int id_post_office, FILE *output_file, pthread_mutex_t *mutex_data) {
                             
     // сразу блокирую мьютекст на всю логику выполнения перемещения писем
     pthread_mutex_lock(mutex_data);
@@ -187,6 +187,8 @@ void move_max_priority_letter_from_postoffice(PostOffice *post_offices, bool *wo
 
     if (max_letter == NULL) {
         // все письма в этом отделении уже доставлены
+        fprintf(output_file, "[service sending letter]: в отделении %u нет доступных писем\n", id_post_office);
+        fflush(output_file);
         pthread_mutex_unlock(mutex_data);
         return;
     }
@@ -223,19 +225,24 @@ void move_max_priority_letter_from_postoffice(PostOffice *post_offices, bool *wo
     // если не нашли куда можно отправить письмо
     // нет дорог между отделениями, нет свободных отделений
     if (id_next_post_office == MAX_SIZE_POST_OFFICES + 1) {
+        fprintf(output_file, "[service sending letter]: письмо %u из отделения %u \
+                не может быть перенаправлено в другое, ввиду недоступности/загруженности\n", \
+                max_letter->id, id_post_office);
+        fflush(output_file);
         pthread_mutex_unlock(mutex_data);
         return;
     }
 
     if (id_next_post_office == id_receiver_post_office) {
+        // если письмо доставлено
         max_letter->state = DELIVERED;
     }
 
-    BufferLetters buffer_letter;
-    buffer_letter.letter = max_letter;
-    buffer_letter.id_post_office_from = id_post_office;
-    buffer_letter.id_post_office_to = id_next_post_office;
-    push_back_vector_BufferLetters(buffer, buffer_letter);
+
+    pop_heap_LetterPtr(&(post_offices[id_post_office].letters));
+    push_heap_LetterPtr(&(post_offices[id_next_post_office].letters), max_letter);
+
+    log_in_file_send_letter(output_file, max_letter->id, id_post_office, id_next_post_office);
 
     pthread_mutex_unlock(mutex_data);
 } 
