@@ -274,6 +274,8 @@ bool move_letter(PostOffice *post_offices, bool *work_post_offices, unsigned int
     pop_heap_LetterPtr(&(post_offices[id_post_office].letters));
     push_heap_LetterPtr(&(post_offices[id_next_post_office].letters), letter);
 
+    letter->id_cur_postoffice = id_next_post_office;
+
     log_in_file_send_letter(output_file, letter->id, id_post_office, id_next_post_office);
 
     return true;

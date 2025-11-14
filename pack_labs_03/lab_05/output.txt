@@ -6,15 +6,25 @@
 				Максимальная вместимость почтового отделения: 1
 [service sending letter]: в отделении 1 нет доступных писем
 [service sending letter]: в отделении 2 нет доступных писем
-[service sending letter]: в отделении 1 нет доступных писем
-[service sending letter]: в отделении 2 нет доступных писем
-[service sending letter]: в отделении 1 нет доступных писем
-[service sending letter]: в отделении 2 нет доступных писем
 [service interactive with user]: Было добавлено письмо 0
-				Приоритет: 2
+				Приоритет: 1
 				Тип письма: простое
 				Техническая информация: vova
-[service interactive with user]: Идет процесс удаления почтового отделения 2
-[service interactive with user]: Удаляется связь отделения 1 с удаляемым отделением
-[service interactive with user]: Отделение 2 успешно удалено
+[service sending letter]: письмо 0 было отправлено из почтового отделения 1 в почтовое отделение 2
+[service sending letter]: в отделении 2 нет доступных писем
 [service sending letter]: в отделении 1 нет доступных писем
+[service sending letter]: в отделении 2 нет доступных писем
+[service interactive with user]: Было добавлено письмо 1
+				Приоритет: 1
+				Тип письма: простое
+				Техническая информация: vova
+[service sending letter]: письмо 1 из отделения 1 не может быть перенаправлено в другое, ввиду недоступности/загруженности
+[service sending letter]: в отделении 2 нет доступных писем
+[service interactive with user]: Письмо 0 успешно забрали из почтового отделения 2
+[service sending letter]: письмо 1 было отправлено из почтового отделения 1 в почтовое отделение 2
+[service sending letter]: в отделении 2 нет доступных писем
+[service sending letter]: в отделении 1 нет доступных писем
+[service sending letter]: в отделении 2 нет доступных писем
+[service sending letter]: в отделении 1 нет доступных писем
+[service sending letter]: в отделении 2 нет доступных писем
+[service interactive with user]: Письмо 1 успешно забрали из почтового отделения 2

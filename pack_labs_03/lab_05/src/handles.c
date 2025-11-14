@@ -220,7 +220,7 @@ error_code_t handle_add_letter(PostOffice *post_offices, bool *work_post_offices
     return SUCCESS;
 }
 
-void handle_get_letter(bool *work_post_offices, Vector_LetterPtr *vector_all_letters, \
+void handle_get_letter(PostOffice *post_offices, bool *work_post_offices, Vector_LetterPtr *vector_all_letters, \
                                 FILE *output_file, pthread_mutex_t *mutex_data) {
     
     // не используется mutex, потому что даже если во время обработки письмо было доставлено, то никакой записи не произойдет 
@@ -243,7 +243,7 @@ void handle_get_letter(bool *work_post_offices, Vector_LetterPtr *vector_all_let
     }
 
     if (cur_letter->state == NOT_DELIVERED) {
-        printf("Письмо не может быть доставлено ввиду загруженности/недоступности\n");
+        printf("Письмо не может быть доставлено потому что его удалили из системы\n");
         return;
     }
     if (cur_letter->state == IN_THE_PROCCESS_OF_SENDING) {
@@ -265,7 +265,7 @@ void handle_get_letter(bool *work_post_offices, Vector_LetterPtr *vector_all_let
 
     cur_letter->taked = true;
 
+    pop_from_heap_deleted_letter(post_offices, cur_letter);
+
     pthread_mutex_unlock(mutex_data);
-
-
 }

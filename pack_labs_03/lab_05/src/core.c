@@ -55,7 +55,7 @@ void* start_interactive_console(void *args) {
                 break;
             }
             case (GET_LETTER): {
-                handle_get_letter(thread_args->work_post_offices, thread_args->vector_all_letters, \
+                handle_get_letter(thread_args->post_offices, thread_args->work_post_offices, thread_args->vector_all_letters, \
                                     thread_args->output_file, thread_args->mutex_data);
                 if (error != SUCCESS) {
                     *(thread_args->thread_live) = false;
