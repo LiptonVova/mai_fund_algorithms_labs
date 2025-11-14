@@ -1,7 +1,6 @@
 #include "../include/handles.h"
 
-
-error_code_t handle_add_postoffice(PostOffice *post_offices, bool *work_post_offices, FILE *output_file) {
+error_code_t handle_add_postoffice(PostOffice *post_offices, bool *work_post_offices, FILE *output_file, pthread_mutex_t *mutex_data) {
     printf("============================Добавление почтового отделения============================\n");
     error_code_t error = SUCCESS;
     unsigned int id_post_office = 0;
@@ -39,22 +38,48 @@ error_code_t handle_add_postoffice(PostOffice *post_offices, bool *work_post_off
         if (error != SUCCESS) return error; 
 
         new_post_office.links[id_link_post_office] = true;
-        post_offices[id_link_post_office].links[id_post_office] = true;
     }
 
     new_post_office.id = id_post_office;
     new_post_office.capacity_post_office = capacity_post_office;
     new_post_office.letters = create_priority_queue_impl();
 
+    pthread_mutex_lock(mutex_data);
+
+    fprintf(output_file, "[service interactive with user]: было добавлено новое почтовое отделение: Почтовое отделение %u\n", id_post_office);
+    
+    bool flag = false;
+    for (int i = 0; i < MAX_SIZE_POST_OFFICES; ++i) {
+        if (new_post_office.links[i] == true) {
+            // добавляем двустороннюю связь
+            if (flag == false) {
+                fprintf(output_file, "\t\t\t\tИмеет связь со следующими отделениями: ");
+            }
+            fprintf(output_file, "%d", i);
+            flag = true;
+            post_offices[i].links[id_post_office] = true;
+        }
+    }
+    if (!flag) {
+        fprintf(output_file, "\t\t\t\tНе связано ни с каким отделением\n");
+    }
+    if (flag) {
+        fprintf(output_file, "\n");
+    }
+
+    fprintf(output_file, "\t\t\t\tМаксимальная вместимость почтового отделения: %d\n", capacity_post_office);
+
     post_offices[id_post_office] = new_post_office;
     work_post_offices[id_post_office] = true;
 
-    printf("-- инфо: успешно добавлено!\n");
+    fflush(output_file);
+    pthread_mutex_unlock(mutex_data);
 
+    printf("-- инфо: успешно добавлено!\n");
     return SUCCESS;
 }
 
-error_code_t handle_delete_postoffice(PostOffice *post_offices, bool *work_post_offices, FILE *output_file) {
+error_code_t handle_delete_postoffice(PostOffice *post_offices, bool *work_post_offices, FILE *output_file, pthread_mutex_t *mutex_data) {
     printf("============================Удаление почтового отделения============================\n");
     error_code_t error = SUCCESS;
     unsigned int id_post_office = 0;
@@ -66,18 +91,35 @@ error_code_t handle_delete_postoffice(PostOffice *post_offices, bool *work_post_
         // цикл будет повторяться, если error == WARNING_ID_POST_OFFICE (означает, что невалидный id)
     } while (error != SUCCESS);
 
+    pthread_mutex_lock(mutex_data);
+    
+    fprintf(output_file, "[service interactive with user]: Идет процесс удаления почтового отделения %u\n", id_post_office);
 
     // нужно у всех почтовых отделений удалить связь с удаляемым
     for (int i = 0; i < MAX_SIZE_POST_OFFICES; ++i) {
-        if (work_post_offices[i]) {
+        if (work_post_offices[i] && post_offices[i].links[id_post_office] == true) {
             post_offices[i].links[id_post_office] = false; // удаляем связь
+            fprintf(output_file, "[service interactive with user]: Удаляется связь отделения %u с удаляемым отделением\n", i);
         }
     }
+
+    // Письма, связанные с удаляемым отделением, помечаются как "Не доставлено"
+    // и удаляются из системы
+    while (post_offices[id_post_office].letters.size != 0) {
+        Letter *letter = pop_heap_LetterPtr(&(post_offices[id_post_office].letters));
+        fprintf(output_file, "[service interactive with user]: Письмо %u, связанное с удаляемым отделением, удалено\n", letter->id);
+        letter->state = NOT_DELIVERED;
+    }
+
+    fprintf(output_file, "[service interactive with user]: Отделение %u успешно удалено\n", id_post_office);
+    fflush(output_file);
+    pthread_mutex_unlock(mutex_data);
 
     return SUCCESS;
 }
 
-error_code_t handle_add_letter(PostOffice *post_offices, bool *work_post_offices, FILE *output_file, Vector_LetterPtr* vector_all_letters) {
+error_code_t handle_add_letter(PostOffice *post_offices, bool *work_post_offices, FILE *output_file, \
+                                    Vector_LetterPtr* vector_all_letters, pthread_mutex_t *mutex_data) {
     printf("============================Добавление письма============================\n");
     error_code_t error = SUCCESS;
 
@@ -132,13 +174,30 @@ error_code_t handle_add_letter(PostOffice *post_offices, bool *work_post_offices
     letter->id_postoffice_receiver = id_receiver;
     letter->taked = false;
 
+    pthread_mutex_lock(mutex_data);
+
     push_heap_LetterPtr(&post_offices[id_sender].letters, letter);
     push_back_vector_LetterPtr(vector_all_letters, letter);
+
+    fprintf(output_file, "[service interactive with user]: Было добавлено письмо %u", static_id_letter);
+    fprintf(output_file, "\t\t\t\tПриоритет: %d\n", letter->priority);
+    fprintf(output_file, "\t\t\t\tТип письма: ");
+    if (letter->type == SIMPLE) fprintf(output_file, "простое\n");
+    if (letter->type == URGENT) fprintf(output_file, "срочное\n");
+
+    fprintf(output_file, "\t\t\t\tТехническая информация: %s\n", letter->tech_data);
+
+    fflush(output_file);
+    pthread_mutex_unlock(mutex_data);
 
     return SUCCESS;
 }
 
-void handle_get_letter(bool *work_post_offices, Vector_LetterPtr *vector_all_letters, FILE *output_file) {
+void handle_get_letter(bool *work_post_offices, Vector_LetterPtr *vector_all_letters, \
+                                FILE *output_file, pthread_mutex_t *mutex_data) {
+    
+    // не используется mutex, потому что даже если во время обработки письмо было доставлено, то никакой записи не произойдет 
+    // и гонки нет
     printf("Введите id письма, которое нужно найти: ");
     int id_letter = 0;
     scanf("%d", &id_letter);
@@ -171,5 +230,15 @@ void handle_get_letter(bool *work_post_offices, Vector_LetterPtr *vector_all_let
     }
 
     printf("Вы успешно забрали письмо!\n");
+
+    pthread_mutex_lock(mutex_data);
+
+    fprintf(output_file, "[service interactive with user]: Письмо %u успешно забрали из почтового отделения %u\n", cur_letter->id, id_receiver);
+    fflush(output_file);
+
     cur_letter->taked = true;
+
+    pthread_mutex_unlock(mutex_data);
+
+
 }

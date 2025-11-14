@@ -46,12 +46,8 @@ typedef struct {
     bool taked; // забирали ли из почтового отделения это письмо
 } Letter;
 
-
 typedef Letter* LetterPtr;
-DEFINE_VECTOR(LetterPtr)
 DEFINE_BINARY_MIN_HEAP(LetterPtr)
-// для bfs
-DEFINE_LIST_STACK_QUEUE(size_t)
 
 typedef struct {
     unsigned int id; // id почтового отделения
@@ -59,6 +55,20 @@ typedef struct {
     unsigned int capacity_post_office; // вместимость почтового отделения
     Heap_LetterPtr letters; // очередь с приоритетом с письмами
 } PostOffice;
+
+// структура, в которую сохраняются все перемещения писем, чтобы синхронизировать изменения
+typedef struct {
+    Letter *letter;
+    unsigned int id_post_office_from;
+    unsigned int id_post_office_to;
+} BufferLetters;
+
+DEFINE_VECTOR(LetterPtr)
+DEFINE_VECTOR(BufferLetters)
+// для bfs
+DEFINE_LIST_STACK_QUEUE(size_t)
+
+
 
 typedef enum {
     ADD_POSTOFFICE = 1,
@@ -71,6 +81,7 @@ typedef enum {
 } Choice;
 
 
+Vector_BufferLetters create_buffer_letters_impl();
 Vector_LetterPtr create_vector_impl();
 Heap_LetterPtr create_priority_queue_impl();
 LinkedList_size_t create_linked_list_stack_queue_impl();

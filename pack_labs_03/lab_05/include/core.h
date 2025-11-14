@@ -18,6 +18,8 @@ typedef struct {
     FILE *input_file;
     FILE *output_file;
     Vector_LetterPtr* vector_all_letters;
+    pthread_mutex_t* mutex_data;
+    bool* thread_live;
 } ThreadArgs;
 
 

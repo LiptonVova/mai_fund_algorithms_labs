@@ -1,8 +1,5 @@
 #include "../include/config.h"
 
-
-
-
 void delete_func(Letter* value) {
     free(value);
 }
@@ -39,7 +36,7 @@ Letter* default_constructor() {
 
 Vector_LetterPtr create_vector_impl() {
     const size_t initial_capacity = 10;
-    return create_vector_LetterPtr(initial_capacity, copy_func, delete_func);
+    return create_vector_LetterPtr(initial_capacity, copy_func, delete_func, comp, default_constructor);
 }
 
 Heap_LetterPtr create_priority_queue_impl() {
@@ -68,4 +65,42 @@ size_t default_constructor_size_t() {
 
 LinkedList_size_t create_linked_list_stack_queue_impl() {
     return create_list_size_t(delete_func_size_t, copy_func_size_t, comp_size_t, default_constructor_size_t);
+}
+
+BufferLetters copy_func_buffer_letters(BufferLetters other) {
+    BufferLetters buffer;
+    buffer.letter = other.letter;
+    buffer.id_post_office_from = other.id_post_office_from;
+    buffer.id_post_office_to = other.id_post_office_to;
+    return buffer;
+}
+
+void delete_func_buffer_letters(BufferLetters value) {
+    return;
+}
+
+int comp_buffer_letters(BufferLetters value_1, BufferLetters value_2) {
+    if (comp(value_1.letter, value_2.letter) != 0) {
+        return comp(value_1.letter, value_2.letter);
+    }
+    if (value_1.id_post_office_from != value_2.id_post_office_from) {
+        return 1;
+    }
+    if (value_1.id_post_office_to != value_2.id_post_office_to) {
+        return 1;
+    }
+    return 0;
+}
+
+BufferLetters default_constructor_buffer_letter() {
+    BufferLetters buffer_letter;
+    buffer_letter.letter = NULL;
+    buffer_letter.id_post_office_from = 0;
+    buffer_letter.id_post_office_to = 0;
+    return buffer_letter;
+}
+
+Vector_BufferLetters create_buffer_letters_impl() {
+    const size_t initial_capacity = 10;
+    return create_vector_BufferLetters(initial_capacity, copy_func_buffer_letters, delete_func_buffer_letters, comp_buffer_letters, default_constructor_buffer_letter );
 }

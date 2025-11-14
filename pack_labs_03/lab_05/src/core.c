@@ -1,16 +1,34 @@
 #include "../include/core.h"
 
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-
 void* handle_start_sending(void *args) {
     ThreadArgs *thread_args = (ThreadArgs*)args;
-    while (true) {
+    Vector_BufferLetters vector_buffer = create_buffer_letters_impl(); // буффер, куда будут добавляться все перемещения писем
+    while (*(thread_args->thread_live) == true) {
         for (unsigned int i = 0; i < MAX_SIZE_POST_OFFICES; ++i) {
             if (thread_args->work_post_offices[i] == true) {
-                move_max_priority_letter_from_postoffice(thread_args->post_offices, thread_args->work_post_offices, i, thread_args->output_file);
+                move_max_priority_letter_from_postoffice(thread_args->post_offices, thread_args->work_post_offices, \
+                                                    i, &vector_buffer, thread_args->mutex_data);
             }
         }
-        sleep(0.2);
+
+        pthread_mutex_lock(thread_args->mutex_data);
+        for (int i = 0; i < vector_buffer.size; ++i) {
+            BufferLetters buffer_letter = get_at_vector_BufferLetters(&vector_buffer, i);
+            unsigned int id_from = buffer_letter.id_post_office_from;
+            unsigned int id_to = buffer_letter.id_post_office_to;
+
+            pop_heap_LetterPtr(&(thread_args->post_offices[id_from].letters));
+            push_heap_LetterPtr(&(thread_args->post_offices[id_to].letters), buffer_letter.letter);
+            
+            log_in_file_send_letter(thread_args->output_file, buffer_letter.letter->id, id_from, id_to);
+        }
+        
+
+        pthread_mutex_unlock(thread_args->mutex_data);
+        
+        vector_buffer.size = 0;
+
+        sleep(10);
     }
     return NULL;
 }
@@ -29,34 +47,57 @@ void* start_interactive_console(void *args) {
         
         switch (choice) {
             case (ADD_POSTOFFICE): {
-                error = handle_add_postoffice(thread_args->post_offices, thread_args->work_post_offices, thread_args->output_file);
-                if (error != SUCCESS) return NULL;
+                error = handle_add_postoffice(thread_args->post_offices, thread_args->work_post_offices, \
+                                                thread_args->output_file, thread_args->mutex_data);
+                if (error != SUCCESS) {
+                    *(thread_args->thread_live) = false;
+                    return NULL;
+                }
                 break;
             }
             case (DELETE_POSTOFFICE): {
-                error = handle_delete_postoffice(thread_args->post_offices, thread_args->work_post_offices, thread_args->output_file);
-                if (error != SUCCESS) return NULL;
+                error = handle_delete_postoffice(thread_args->post_offices, thread_args->work_post_offices, \
+                                                thread_args->output_file, thread_args->mutex_data);
+                if (error != SUCCESS) {
+                    *(thread_args->thread_live) = false;
+                    return NULL;
+                }
                 break;
             }
             case (ADD_LETTER): {
-                error = handle_add_letter(thread_args->post_offices, thread_args->work_post_offices, thread_args->output_file, thread_args->vector_all_letters);
-                if (error != SUCCESS) return NULL;
+                error = handle_add_letter(thread_args->post_offices, thread_args->work_post_offices, \
+                                    thread_args->output_file, thread_args->vector_all_letters, thread_args->mutex_data);
+                if (error != SUCCESS) {
+                    *(thread_args->thread_live) = false;
+                    return NULL;
+                }
                 break;
             }
             case (GET_LETTER): {
-                handle_get_letter(thread_args->work_post_offices, thread_args->vector_all_letters, thread_args->output_file);
-                if (error != SUCCESS) return NULL;
+                handle_get_letter(thread_args->work_post_offices, thread_args->vector_all_letters, \
+                                    thread_args->output_file, thread_args->mutex_data);
+                if (error != SUCCESS) {
+                    *(thread_args->thread_live) = false;
+                    return NULL;
+                }
                 break;
             }
             case (PRINT_ALL_LETTERS): {
-                print_all_letters(thread_args->vector_all_letters); 
-                if (error != SUCCESS) return NULL;
+                print_all_letters(thread_args->vector_all_letters, thread_args->mutex_data); 
+                if (error != SUCCESS) {
+                    *(thread_args->thread_live) = false;
+                    return NULL;
+                }
                 break;
             }
             case (READ_DATA_FROM_INPUT_FILE): {
                 // считать данные из файла
-                error = read_data_from_input_file(thread_args->post_offices, thread_args->work_post_offices, thread_args->input_file);
-                if (error != SUCCESS) return NULL;
+                error = read_data_from_input_file(thread_args->post_offices, thread_args->work_post_offices, \
+                                thread_args->input_file, thread_args->mutex_data);
+                if (error != SUCCESS) {
+                    *(thread_args->thread_live) = false;
+                    return NULL;
+                }
                 break;
             }
             case (EXIT): {
@@ -70,6 +111,7 @@ void* start_interactive_console(void *args) {
         }
     } while (choice != EXIT);
 
+    *(thread_args->thread_live) = false;
     return NULL;
 }
 
@@ -92,12 +134,17 @@ void start_mail_application(int argc, char *argv[]) {
     Vector_LetterPtr vector_all_letters = create_vector_impl(); // вектор всех писем
 
     pthread_t interaction_with_user, sending_letters;
+    pthread_mutex_t mutex_data = PTHREAD_MUTEX_INITIALIZER;
 
     ThreadArgs args;
     args.post_offices = post_offices;
     args.work_post_offices = work_post_offices;
     args.input_file = input_file;
+    args.output_file = output_file;
     args.vector_all_letters = &vector_all_letters;
+    args.mutex_data = &mutex_data;
+    bool thread_live = true;
+    args.thread_live = &thread_live;
 
     pthread_create(&interaction_with_user, NULL, start_interactive_console, &args);
     pthread_create(&sending_letters, NULL, handle_start_sending, &args);
@@ -105,5 +152,5 @@ void start_mail_application(int argc, char *argv[]) {
     pthread_join(interaction_with_user, NULL);
     pthread_join(sending_letters, NULL);
 
-    pthread_mutex_destroy(&mutex);
+    pthread_mutex_destroy(&mutex_data);
 }

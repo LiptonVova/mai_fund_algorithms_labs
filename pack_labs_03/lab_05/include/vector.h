@@ -4,17 +4,20 @@
 #include <stdlib.h>
 
 #define DEFINE_VECTOR(VECTOR_TYPE) \
-typedef struct {\
+typedef struct { \
     VECTOR_TYPE *data; /* указатель на элементы */ \
     size_t size; /* текущее количество элементов */ \
     size_t capacity; /* вместимость (количество выделенных элементов) */ \
     VECTOR_TYPE (*CopyVoidPtr)(VECTOR_TYPE); \
     void (*DeleteVoidPtr)(VECTOR_TYPE); \
+    int (*Comp)(VECTOR_TYPE, VECTOR_TYPE); \
+    VECTOR_TYPE (*DefaultConstructor)(void);\
 } Vector_##VECTOR_TYPE; \
 \
 \
 /* Создание нового вектора */ \
-inline static Vector_##VECTOR_TYPE create_vector_##VECTOR_TYPE(size_t initial_capacity, VECTOR_TYPE(*CopyFunc)(VECTOR_TYPE), void (*DeleteFunc)(VECTOR_TYPE)) { \
+inline static Vector_##VECTOR_TYPE create_vector_##VECTOR_TYPE(size_t initial_capacity, VECTOR_TYPE(*CopyFunc)(VECTOR_TYPE), \
+                                            void (*DeleteFunc)(VECTOR_TYPE), int (*Comp)(VECTOR_TYPE, VECTOR_TYPE), VECTOR_TYPE (*DefaultConstructor)(void)) { \
     Vector_##VECTOR_TYPE vector; \
     vector.size = 0; \
     vector.capacity = initial_capacity; \
@@ -26,6 +29,8 @@ inline static Vector_##VECTOR_TYPE create_vector_##VECTOR_TYPE(size_t initial_ca
     } \
     vector.CopyVoidPtr = CopyFunc; \
     vector.DeleteVoidPtr = DeleteFunc; \
+    vector.Comp = Comp; \
+    vector.DefaultConstructor = DefaultConstructor; \
     return vector; \
 } \
 /* Удаление внутреннего содержимого вектора (data, size=0, capacity=0) */ \
@@ -43,7 +48,7 @@ inline static int is_equal_vector_##VECTOR_TYPE(const Vector_##VECTOR_TYPE *v1, 
         return 0; \
     } \
     for (size_t i = 0; i < v1->size; ++i) { \
-        if (v1->data[i] != v2->data[i]) { \
+        if (v1->Comp(v1->data[i], v2->data[i]) != 0) { \
             return 0; \
         }\
     }\
@@ -119,7 +124,7 @@ inline static void delete_at_vector_##VECTOR_TYPE(Vector_##VECTOR_TYPE *v, size_
 /* Получение элемента по индексу */ \
 inline static VECTOR_TYPE get_at_vector_##VECTOR_TYPE(const Vector_##VECTOR_TYPE *v, size_t index) { \
     if (index < 0 || index >= v->size) { \
-        return (VECTOR_TYPE)0; \
+        return v->DefaultConstructor(); \
     } \
     return v->data[index]; \
 } \

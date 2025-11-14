@@ -36,18 +36,25 @@ error_code_t create_input_output_files(FILE **input, FILE **output, int argc, ch
     return SUCCESS;
 }
 
-error_code_t read_data_from_input_file(PostOffice *post_offices, bool *work_post_offices, FILE *input_file) {
+error_code_t read_data_from_input_file(PostOffice *post_offices, bool *work_post_offices, \
+                                        FILE *input_file, pthread_mutex_t *mutex_data) {
     unsigned int sender = 0, receiver = 0;
+
+    pthread_mutex_lock(mutex_data);
     while (!feof(input_file)) {
         fscanf(input_file, "%d-%d", &sender, &receiver);
 
         error_code_t error = validate_link_sender_receiver(sender, receiver, post_offices, work_post_offices);
-        if (error == ERROR_POST_OFFICE_NOT_EXIST || error == ERROR_FORMAT_DATA) return error;
+        if (error == ERROR_POST_OFFICE_NOT_EXIST || error == ERROR_FORMAT_DATA) {
+            pthread_mutex_unlock(mutex_data);
+            return error;
+        }
 
         // создаю двунаправленное соединение
         post_offices[sender].links[receiver] = true;
         post_offices[receiver].links[sender] = true;
     }
+    pthread_mutex_unlock(mutex_data);
     return SUCCESS;
 }
 
@@ -103,11 +110,21 @@ void print_letter(Letter *letter) {
     printf("\tТехнические данные: %s\n", letter->tech_data);
 }
 
-void print_all_letters(Vector_LetterPtr *vector_all_letters) {
+void print_all_letters(Vector_LetterPtr *vector_all_letters, pthread_mutex_t *mutex_data) {
+    pthread_mutex_lock(mutex_data);
     for (int i = 0; i < vector_all_letters->size; ++i) {
         print_letter(get_at_vector_LetterPtr(vector_all_letters, i));
     }
+    pthread_mutex_unlock(mutex_data);
 }
+
+
+void log_in_file_send_letter(FILE *output_file, unsigned int letter_id, unsigned int id_from, unsigned int id_to) {
+    fprintf(output_file, "[service sending letter]: письмо %u было отправлено из почтового отделения %u в почтовое отделение %u\n", \
+                                                                            letter_id, id_from, id_to);
+    fflush(output_file);
+}
+
 
 
 void bfs(PostOffice *post_offices, bool *work_post_offices, unsigned int start_position, int *distance) {
@@ -135,7 +152,12 @@ void bfs(PostOffice *post_offices, bool *work_post_offices, unsigned int start_p
 }
 
 
-bool move_max_priority_letter_from_postoffice(PostOffice *post_offices, bool *work_post_offices, unsigned int id_post_office, FILE *output_file) {
+void move_max_priority_letter_from_postoffice(PostOffice *post_offices, bool *work_post_offices, \
+                                        unsigned int id_post_office, Vector_BufferLetters *buffer, pthread_mutex_t *mutex_data) {
+                            
+    // сразу блокирую мьютекст на всю логику выполнения перемещения писем
+    pthread_mutex_lock(mutex_data);
+
     // с какими отделениями есть связь
     bool *links = post_offices[id_post_office].links;
 
@@ -165,7 +187,8 @@ bool move_max_priority_letter_from_postoffice(PostOffice *post_offices, bool *wo
 
     if (max_letter == NULL) {
         // все письма в этом отделении уже доставлены
-        return false;
+        pthread_mutex_unlock(mutex_data);
+        return;
     }
 
 
@@ -190,20 +213,29 @@ bool move_max_priority_letter_from_postoffice(PostOffice *post_offices, bool *wo
             min_distance = distance[id_receiver_post_office];
             id_next_post_office = next_id;
         }
+        else if (min_distance == -1) {
+            min_distance = distance[id_receiver_post_office];
+            id_next_post_office = next_id;
+        }
     }
 
 
     // если не нашли куда можно отправить письмо
     // нет дорог между отделениями, нет свободных отделений
     if (id_next_post_office == MAX_SIZE_POST_OFFICES + 1) {
-        return false;
+        pthread_mutex_unlock(mutex_data);
+        return;
     }
 
     if (id_next_post_office == id_receiver_post_office) {
         max_letter->state = DELIVERED;
     }
-    
-    pop_heap_LetterPtr(&post_offices[id_post_office].letters);
-    push_heap_LetterPtr(&(post_offices[id_next_post_office].letters), max_letter);
-    return true;
+
+    BufferLetters buffer_letter;
+    buffer_letter.letter = max_letter;
+    buffer_letter.id_post_office_from = id_post_office;
+    buffer_letter.id_post_office_to = id_next_post_office;
+    push_back_vector_BufferLetters(buffer, buffer_letter);
+
+    pthread_mutex_unlock(mutex_data);
 } 
