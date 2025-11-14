@@ -47,7 +47,7 @@ typedef struct {
 } Letter;
 
 typedef Letter* LetterPtr;
-DEFINE_BINARY_MIN_HEAP(LetterPtr)
+DEFINE_BINARY_MAX_HEAP(LetterPtr)
 
 typedef struct {
     unsigned int id; // id почтового отделения
