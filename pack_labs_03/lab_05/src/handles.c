@@ -158,7 +158,7 @@ error_code_t handle_add_letter(PostOffice *post_offices, bool *work_post_offices
         return ERROR_MALLOC;
     }
 
-    printf("Введите число (тип) письма (простое - 1, срочное - 2): \n");
+    printf("Введите число (тип) письма (простое - 1, срочное - 2): ");
     int type_letter = 0;
     do {
         scanf("%d", &type_letter);
@@ -268,4 +268,31 @@ void handle_get_letter(PostOffice *post_offices, bool *work_post_offices, Vector
     pop_from_heap_deleted_letter(post_offices, cur_letter);
 
     pthread_mutex_unlock(mutex_data);
+}
+
+error_code_t handle_make_letter_not_delivered(PostOffice *post_offices, bool *work_post_offices, FILE *output_file, \
+                                        Vector_LetterPtr *vector_all_letters, pthread_mutex_t *mutex_data) {
+    unsigned int id_letter = 0; 
+    error_code_t error = SUCCESS;
+    do {
+        printf("Введите id письма, которое вы хотите сделать недоставленным: ");
+        scanf("%d", &id_letter);
+
+        error = validate_id_letter_for_make_not_delivered(id_letter, vector_all_letters);
+        if (error != SUCCESS) printf("Попробуйте еще раз: ");
+    } while (error != SUCCESS);
+
+    pthread_mutex_lock(mutex_data);
+    Letter *letter = get_at_vector_LetterPtr(vector_all_letters, id_letter);
+
+    letter->state = NOT_DELIVERED;
+    // удаляем из системы
+    if (work_post_offices[letter->id_cur_postoffice] == true) pop_from_heap_deleted_letter(post_offices, letter);
+
+    fprintf(output_file, "[service interactive with user]: состояние письма %u было изменено на 'Не доставлено', письмо удалено из системы\n", letter->id);
+
+    printf("Состояние письма успешно изменено\n");
+    pthread_mutex_unlock(mutex_data);
+
+    return SUCCESS;
 }

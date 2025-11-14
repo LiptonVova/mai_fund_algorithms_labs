@@ -16,6 +16,7 @@ error_code_t validate_delete_id_postoffice(const bool *work_post_offices, const 
 error_code_t validate_type_letter(TypeLetter type_letter);
 bool validate_work_post_office(PostOffice *post_offices, bool *work_post_offices, bool *links, int *distance, unsigned int next_id_post_office);
 error_code_t validate_id_postoffice_for_add_letter(PostOffice *post_offices, bool *work_post_offices, unsigned int id_sender);
+error_code_t validate_id_letter_for_make_not_delivered(unsigned int id_letter, Vector_LetterPtr *vector_all_letters);
 
 
 #endif

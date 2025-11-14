@@ -119,3 +119,11 @@ bool validate_work_post_office(PostOffice *post_offices, bool *work_post_offices
     }
     return true;
 }
+
+error_code_t validate_id_letter_for_make_not_delivered(unsigned int id_letter, Vector_LetterPtr *vector_all_letters) {
+    if (id_letter >= vector_all_letters->size) {
+        printf("-- варнинг: несуществующее письмо\n");
+        return WARNING_NOT_EXIST_LETTER;
+    }
+    return SUCCESS;    
+}

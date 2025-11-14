@@ -23,6 +23,7 @@ typedef enum {
     WARNING_LINK_POST_OFFICES,
     WARNING_TYPE_LETTER,
     WARNING_ID_POST_OFFICE_FOR_ADD_LETTER,
+    WARNING_NOT_EXIST_LETTER,
 } error_code_t;
 
 typedef enum {
@@ -72,7 +73,8 @@ typedef enum {
     GET_LETTER = 4,
     PRINT_ALL_LETTERS = 5,
     READ_DATA_FROM_INPUT_FILE = 6,
-    EXIT = 7,
+    CHANGE_STATE_LETTER_TO_NOT_DELIVERED = 7,
+    EXIT = 8,
 } Choice;
 
 Vector_LetterPtr create_vector_impl();

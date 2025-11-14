@@ -22,5 +22,8 @@ error_code_t handle_add_letter(PostOffice *post_offices, bool *work_post_offices
 void handle_get_letter(PostOffice *post_offices, bool *work_post_offices, Vector_LetterPtr *vector_all_letters, \
                                 FILE *output_file, pthread_mutex_t *mutex_data);
 
+error_code_t handle_make_letter_not_delivered(PostOffice *post_offices, bool *work_post_offices, FILE *output_file, \
+                                        Vector_LetterPtr *vector_all_letters, pthread_mutex_t *mutex_data);
+
 
 #endif

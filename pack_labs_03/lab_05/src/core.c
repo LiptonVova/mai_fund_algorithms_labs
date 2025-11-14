@@ -57,14 +57,15 @@ void* start_interactive_console(void *args) {
             case (GET_LETTER): {
                 handle_get_letter(thread_args->post_offices, thread_args->work_post_offices, thread_args->vector_all_letters, \
                                     thread_args->output_file, thread_args->mutex_data);
-                if (error != SUCCESS) {
-                    *(thread_args->thread_live) = false;
-                    return NULL;
-                }
                 break;
             }
             case (PRINT_ALL_LETTERS): {
                 print_all_letters(thread_args->vector_all_letters, thread_args->mutex_data); 
+                break;
+            }
+            case (CHANGE_STATE_LETTER_TO_NOT_DELIVERED): {
+                error = handle_make_letter_not_delivered(thread_args->post_offices, thread_args->work_post_offices, thread_args->output_file, \
+                                                thread_args->vector_all_letters, thread_args->mutex_data);
                 if (error != SUCCESS) {
                     *(thread_args->thread_live) = false;
                     return NULL;
