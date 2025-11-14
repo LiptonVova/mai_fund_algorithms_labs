@@ -38,7 +38,7 @@ void* start_interactive_console(void *args) {
             }
             case (DELETE_POSTOFFICE): {
                 error = handle_delete_postoffice(thread_args->post_offices, thread_args->work_post_offices, \
-                                                thread_args->output_file, thread_args->mutex_data);
+                                                thread_args->output_file, thread_args->vector_all_letters, thread_args->mutex_data);
                 if (error != SUCCESS) {
                     *(thread_args->thread_live) = false;
                     return NULL;
@@ -93,6 +93,7 @@ void* start_interactive_console(void *args) {
     } while (choice != EXIT);
 
     *(thread_args->thread_live) = false;
+    delete_vector_LetterPtr(thread_args->vector_all_letters);
     return NULL;
 }
 

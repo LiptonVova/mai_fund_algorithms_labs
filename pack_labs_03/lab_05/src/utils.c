@@ -1,6 +1,28 @@
 #include "../include/utils.h"
 
 
+void pop_from_heap_deleted_letter(PostOffice *post_offices, Letter *letter) {
+    // функция удаляет из почтового отделения где сейчас находится это письмо, это письмо
+
+    unsigned int id_letter = letter->id;
+    unsigned int id_post_office = letter->id_cur_postoffice;
+
+    Vector_LetterPtr buffer = create_vector_impl();
+    while (post_offices[id_post_office].letters.size != 0) {
+        Letter *letter = pop_heap_LetterPtr(&post_offices[id_post_office].letters);
+        if (letter->id == id_letter) {
+            // пропускаем это письмо
+            break;
+        }
+        push_back_vector_LetterPtr(&buffer, letter);
+    }
+
+    for (int i = 0; i < buffer.size; ++i) {
+        push_heap_LetterPtr(&post_offices[id_post_office].letters, get_at_vector_LetterPtr(&buffer, i));
+    }
+}
+
+
 error_code_t create_input_output_files(FILE **input, FILE **output, int argc, char *argv[]) {
     *input = fopen(argv[1], "r");
     if (!(*input)) {
@@ -158,8 +180,7 @@ void move_max_priority_letter_from_postoffice(PostOffice *post_offices, bool *wo
     // сразу блокирую мьютекст на всю логику выполнения перемещения писем
     pthread_mutex_lock(mutex_data);
 
-    // с какими отделениями есть связь
-    bool *links = post_offices[id_post_office].links;
+
 
     Vector_LetterPtr vector_letters = create_vector_impl();
 
@@ -193,8 +214,21 @@ void move_max_priority_letter_from_postoffice(PostOffice *post_offices, bool *wo
         return;
     }
 
+    move_letter(post_offices, work_post_offices, id_post_office, max_letter, output_file);
 
-    unsigned int id_receiver_post_office = max_letter->id_postoffice_receiver;
+    pthread_mutex_unlock(mutex_data);
+
+    return;
+} 
+
+bool move_letter(PostOffice *post_offices, bool *work_post_offices, unsigned int id_post_office, Letter *letter, FILE *output_file) {
+    // функция, которая вызывает эту функцию, должна сама вызать mutex lock!!! 
+
+
+    // с какими отделениями есть связь
+    bool *links = post_offices[id_post_office].links;
+
+    unsigned int id_receiver_post_office = letter->id_postoffice_receiver;
 
     unsigned int id_next_post_office = MAX_SIZE_POST_OFFICES + 1;
     int min_distance = INT_MAX;
@@ -225,23 +259,22 @@ void move_max_priority_letter_from_postoffice(PostOffice *post_offices, bool *wo
     // если не нашли куда можно отправить письмо
     // нет дорог между отделениями, нет свободных отделений
     if (id_next_post_office == MAX_SIZE_POST_OFFICES + 1) {
-        fprintf(output_file, "[service sending letter]: письмо %u из отделения %u ", max_letter->id, id_post_office);
+        fprintf(output_file, "[service sending letter]: письмо %u из отделения %u ", letter->id, id_post_office);
         fprintf(output_file, "не может быть перенаправлено в другое, ввиду недоступности/загруженности\n");
         fflush(output_file);
-        pthread_mutex_unlock(mutex_data);
-        return;
+        return false;
     }
 
     if (id_next_post_office == id_receiver_post_office) {
         // если письмо доставлено
-        max_letter->state = DELIVERED;
+        letter->state = DELIVERED;
     }
 
 
     pop_heap_LetterPtr(&(post_offices[id_post_office].letters));
-    push_heap_LetterPtr(&(post_offices[id_next_post_office].letters), max_letter);
+    push_heap_LetterPtr(&(post_offices[id_next_post_office].letters), letter);
 
-    log_in_file_send_letter(output_file, max_letter->id, id_post_office, id_next_post_office);
+    log_in_file_send_letter(output_file, letter->id, id_post_office, id_next_post_office);
 
-    pthread_mutex_unlock(mutex_data);
-} 
+    return true;
+}

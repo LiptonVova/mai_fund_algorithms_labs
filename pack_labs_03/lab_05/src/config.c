@@ -29,6 +29,7 @@ Letter* default_constructor() {
     letter->priority = 0;
     letter->id_postoffice_sender = 0;
     letter->id_postoffice_receiver = 0;
+    letter->id_cur_postoffice = 0;
     strcpy(letter->tech_data, "");
     return letter;
     

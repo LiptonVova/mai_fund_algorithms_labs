@@ -43,6 +43,7 @@ typedef struct {
     int priority; // приоритет, чем больше, тем важнее
     unsigned int id_postoffice_sender; // id почтового отделения отправителя
     unsigned int id_postoffice_receiver; // id почтового отделения получателя
+    unsigned int id_cur_postoffice; // id почтового отделения, где сейчас это письмо
     char tech_data[100]; // технические данные
     bool taked; // забирали ли из почтового отделения это письмо
 } Letter;

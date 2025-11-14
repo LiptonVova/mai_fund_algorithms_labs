@@ -79,7 +79,8 @@ error_code_t handle_add_postoffice(PostOffice *post_offices, bool *work_post_off
     return SUCCESS;
 }
 
-error_code_t handle_delete_postoffice(PostOffice *post_offices, bool *work_post_offices, FILE *output_file, pthread_mutex_t *mutex_data) {
+error_code_t handle_delete_postoffice(PostOffice *post_offices, bool *work_post_offices, FILE *output_file, \
+                                    Vector_LetterPtr *vector_all_letters, pthread_mutex_t *mutex_data) {
     printf("============================Удаление почтового отделения============================\n");
     error_code_t error = SUCCESS;
     unsigned int id_post_office = 0;
@@ -95,6 +96,36 @@ error_code_t handle_delete_postoffice(PostOffice *post_offices, bool *work_post_
     
     fprintf(output_file, "[service interactive with user]: Идет процесс удаления почтового отделения %u\n", id_post_office);
 
+    for (int i = 0; i < vector_all_letters->size; ++i) {
+        Letter *letter = get_at_vector_LetterPtr(vector_all_letters, i);
+        // Письма, связанные с удаляемым отделением, помечаются как "Не доставлено"
+        // и удаляются из системы
+        // если id почтового отделения получателя это удаляемое почтовое отделение, то нужно удалить это письмо
+        if (letter->id_postoffice_receiver == id_post_office && letter->taked == false) {
+            // если letter->taked == true, то это письмо уже доставали, его уже нет в почтвом отделении
+
+            // удаляем из кучи в отделении
+            pop_from_heap_deleted_letter(post_offices, letter);
+            
+            letter->state = NOT_DELIVERED;
+        }
+
+        else if (letter->id_cur_postoffice == id_post_office) {
+            // Письма, не связанные с этим отделением, отправляются в другие
+            // отделения
+
+            // если конечной целью этого письма не является удаляемое почтовое отделение
+            // но в данный момент времени оно находится в удаемом отделении
+            // то надо переместить данное письмо в другое отделение
+
+            bool flag = move_letter(post_offices, work_post_offices, id_post_office, letter, output_file);
+            if (flag == false) {
+                // отправить не получилось, значит, чтобы не было бесконечного цикла - удаляем это письмо
+                pop_from_heap_deleted_letter(post_offices, letter);
+            }
+        }
+    }
+
     // нужно у всех почтовых отделений удалить связь с удаляемым
     for (int i = 0; i < MAX_SIZE_POST_OFFICES; ++i) {
         if (work_post_offices[i] && post_offices[i].links[id_post_office] == true) {
@@ -103,18 +134,13 @@ error_code_t handle_delete_postoffice(PostOffice *post_offices, bool *work_post_
         }
     }
 
-    // Письма, связанные с удаляемым отделением, помечаются как "Не доставлено"
-    // и удаляются из системы
-    while (post_offices[id_post_office].letters.size != 0) {
-        Letter *letter = pop_heap_LetterPtr(&(post_offices[id_post_office].letters));
-        fprintf(output_file, "[service interactive with user]: Письмо %u, связанное с удаляемым отделением, удалено\n", letter->id);
-        letter->state = NOT_DELIVERED;
-    }
+    work_post_offices[id_post_office] = false;
 
     fprintf(output_file, "[service interactive with user]: Отделение %u успешно удалено\n", id_post_office);
     fflush(output_file);
     pthread_mutex_unlock(mutex_data);
 
+    printf("-- инфо: успешно удалено\n");
     return SUCCESS;
 }
 
@@ -172,6 +198,7 @@ error_code_t handle_add_letter(PostOffice *post_offices, bool *work_post_offices
     letter->priority = priority;
     letter->id_postoffice_sender = id_sender;
     letter->id_postoffice_receiver = id_receiver;
+    letter->id_cur_postoffice = id_sender;
     letter->taked = false;
 
     pthread_mutex_lock(mutex_data);

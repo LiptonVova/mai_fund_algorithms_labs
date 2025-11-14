@@ -20,6 +20,9 @@ error_code_t read_data_from_input_file(PostOffice *post_offices, bool *work_post
 void move_max_priority_letter_from_postoffice(PostOffice *post_offices, bool *work_post_offices, \
                                                 unsigned int id_post_office, FILE *output_file, pthread_mutex_t *mutex_data);
 
+
+bool move_letter(PostOffice *post_offices, bool *work_post_offices, unsigned int id_post_office, Letter *max_letter, FILE *output_file);
+
 void print_info();
 
 void print_usage();
@@ -28,5 +31,8 @@ void print_letter(Letter *letter);
 void print_all_letters(Vector_LetterPtr *vector_all_letters, pthread_mutex_t *mutex_data);
 
 void log_in_file_send_letter(FILE *output_file, unsigned int letter_id, unsigned int id_from, unsigned int id_to);
+
+void pop_from_heap_deleted_letter(PostOffice *post_offices, Letter *letter);
+
 
 #endif
