@@ -9,7 +9,7 @@ typedef enum {
     ERROR_MALLOC,
 } error_code_t ;
 
-void translate_to_base(const unsigned int number, const int r, char *result);
+void translate_to_base(const int number, const int r, char *result);
 
 
 #endif

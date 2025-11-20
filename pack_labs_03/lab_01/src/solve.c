@@ -1,7 +1,7 @@
 #include "../include/solve.h"
 
 
-unsigned int bit_increment(unsigned int x) {
+int bit_increment(int x) {
     // вычисление сложения в столбик
     unsigned int remain = 1;
     while (remain) {
@@ -12,66 +12,75 @@ unsigned int bit_increment(unsigned int x) {
     return x;
 }
 
-unsigned int bit_decrement(unsigned int x) {
-    // вычитание в столбик
+int negative(int x) {
+    // сделать отрицательное число
+    return bit_increment(~x);
+}
 
-    unsigned int borrow = 1;
-    while (borrow) {
-        unsigned int temp = (~x) & borrow; // опеределяем в каком бите нужно занять единицу 
-        // нужно найти где в x первый ноль, и при этом в borrow == 1 (поэтому нужно инвертировать биты)
-
-        x = x ^ borrow; // вычитаем 
-        borrow = temp << 1; // если остались заемы, то переносим заем в следующий разряд
-    }
-    return x;
+int bit_decrement(int x) {
+    return negative(bit_increment(negative(x)));
 }
 
 
-void translate_to_base(const unsigned int number, const int r, char *result) {
-    if (r < 1 || r > 5) return;
+void bit_reverse(char *result, int size) {
+    char reverse_result[size];
+    int i = 0;
 
-    unsigned int copy_number = number;
-    const unsigned int total_bits = 64;
-    char cur_result[bit_increment(total_bits)];
+    size = bit_decrement(size);
 
-    for (unsigned int i = 0; i < total_bits; i = bit_increment(i)) {
-        cur_result[i] = '0';
+    if (result[size] == '-') {
+        // обработка минуса
+        reverse_result[i] = '-';
+        i = bit_increment(i);
+        size = bit_decrement(size);
     }
-    cur_result[total_bits] = '\0';
 
-    int index = bit_decrement(total_bits);
+    while (result[size] == '0') {
+        // пропускаем незначащие нули
+        size = bit_decrement(size);
+    }
+    while (size != -1) {
+        reverse_result[i] = result[size];
+        size = bit_decrement(size);
+        i = bit_increment(i);
+    }
+    reverse_result[i] = '\0';
+    strcpy(result, reverse_result);
+}
 
+
+void translate_to_base(int number, const int r, char *result) {
+    if (number == 0) {
+        result[0] = '0';
+        result[1] = '\0';
+        return;
+    }
+    if (r < 1 || r > 5) return;
+    if (result == NULL) return;
+
+    int is_negative = 0;
+    if (number < 0) {
+        number = bit_increment(~number);
+        is_negative = 1;
+    }
+
+    int index = 0;
     const unsigned int mask = bit_decrement(1 << r); // r битов '1' для получения последних r битов числа
 
     const char digits[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     unsigned int tmp = 0;
-    while (copy_number != 0) {
-        tmp = copy_number & mask;
-        cur_result[index] = digits[tmp]; 
-        index = bit_decrement(index);
-        copy_number >>= r;
+    while (number != 0) {
+        tmp = number & mask;
+        result[index] = digits[tmp]; 
+        index = bit_increment(index);
+        number >>= r;
     }
 
-    // Находим позицию первого ненулевого символа
-    unsigned int start_pos = 0;
-    for (; start_pos < bit_decrement(total_bits); start_pos = bit_increment(start_pos)) {
-        if (cur_result[start_pos] != '0') break;
+    if (is_negative) {
+        result[index] = '-';
+        index = bit_increment(index);
     }
 
-    unsigned int j = 0; // позиция в результирующей строке 
-    unsigned int current_pos = start_pos; // позиция в старой строке
-    
-    // Копируем символы пока не достигнем конца строки
-    while (cur_result[current_pos] != '\0') {
-        // Копируем текущий символ
-        result[j] = cur_result[current_pos];
-        
-        // Переходим к следующим позициям
-        j = bit_increment(j);
-        current_pos = bit_increment(current_pos);
-    }
-    
-    // Добавляем завершающий нуль
-    result[j] = '\0';
+    bit_reverse(result, index);
 }

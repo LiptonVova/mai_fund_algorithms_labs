@@ -3,7 +3,8 @@
 
 
 int main() {
-    char result[50];
+    const int BUF_SIZE = 50;
+    char result[BUF_SIZE];
     
     printf("1. Тест с нулем\n");
     translate_to_base(0, 2, result);
@@ -66,7 +67,21 @@ int main() {
     printf("входные данные: number=7, r=2\n");
     printf("ожидаемые выходные данные: 13\n");
     printf("что вывела программа: %s\n", result);
-    printf("вердикт: %s\n", strcmp(result, "13") == 0 ? "PASS" : "FAIL");
+    printf("вердикт: %s\n\n", strcmp(result, "13") == 0 ? "PASS" : "FAIL");
+    
+    printf("10. Тест отрицательных чисел\n");
+    translate_to_base(-5, 3, result);
+    printf("входные данные: number=-5, r=3\n");
+    printf("ожидаемые выходные данные: -5\n");
+    printf("что вывела программа: %s\n", result);
+    printf("вердикт: %s\n\n", strcmp(result, "-5") == 0 ? "PASS" : "FAIL");
+    
+    printf("11. Тест отрицательных чисел\n");
+    translate_to_base(-20, 4, result);
+    printf("входные данные: number=-20, r=4\n");
+    printf("ожидаемые выходные данные: -14\n");
+    printf("что вывела программа: %s\n", result);
+    printf("вердикт: %s\n", strcmp(result, "-14") == 0 ? "PASS" : "FAIL");
     
     return 0;
 }
