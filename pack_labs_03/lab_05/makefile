@@ -1,7 +1,7 @@
 FLAGS = -g -Wall -pthread
 OBJ = main.o config.o core.o utils.o validate.o handles.o
 
-all: main.out test_binary_heap_int.out
+all: main.out test_binary_heap_int.out test_skew_heap.out
 
 clean: 
 	rm -rf *.o *.out
@@ -29,3 +29,9 @@ handles.o: src/handles.c
 
 test_binary_heap_int.out: test_binary_heap_int.c 
 	gcc test_binary_heap_int.c $(FLAGS) -o test_binary_heap_int.out
+
+skew_heap_int.o: include/skew_heap_int.c 
+	gcc include/skew_heap_int.c $(FLAGS) -c -o skew_heap_int.o
+
+test_skew_heap.out: test_skew_heap.c include/skew_heap.h
+	gcc test_skew_heap.c $(FLAGS) -o test_skew_heap.out

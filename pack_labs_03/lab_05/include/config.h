@@ -7,7 +7,8 @@
 #include <stdio.h>
 
 #include "vector.h"
-#include "binary_heap.h"
+// #include "binary_heap.h"
+#include "skew_heap.h"
 #include "linkedList_stack_queue.h"
 
 #define MAX_SIZE_POST_OFFICES 100
@@ -50,7 +51,8 @@ typedef struct {
 } Letter;
 
 typedef Letter* LetterPtr;
-DEFINE_BINARY_MAX_HEAP(LetterPtr)
+// DEFINE_BINARY_MAX_HEAP(LetterPtr)
+DEFINE_SKEW_MAX_HEAP(LetterPtr)
 
 typedef struct {
     unsigned int id; // id почтового отделения
