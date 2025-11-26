@@ -122,6 +122,8 @@ error_code_t handle_delete_postoffice(PostOffice *post_offices, bool *work_post_
             if (flag == false) {
                 // отправить не получилось, значит, чтобы не было бесконечного цикла - удаляем это письмо
                 pop_from_heap_deleted_letter(post_offices, letter);
+                // удаляем из системы
+                letter->state = NOT_DELIVERED;
             }
         }
     }
