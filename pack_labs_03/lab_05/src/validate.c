@@ -13,7 +13,7 @@ error_code_t validate_count_arguments(int argc) {
 
 error_code_t validate_link_sender_receiver(unsigned int sender, unsigned int receiver, PostOffice *post_offices, bool* work_post_offices) {
     if (sender >= MAX_SIZE_POST_OFFICES || receiver >= MAX_SIZE_POST_OFFICES) {
-        printf("-- ошибка: id почтового отделения не может быть больше %ud", MAX_SIZE_POST_OFFICES);
+        printf("-- ошибка: id почтового отделения не может быть больше %u", MAX_SIZE_POST_OFFICES);
         return ERROR_FORMAT_DATA;
     }
     if (sender == receiver) {
@@ -21,11 +21,11 @@ error_code_t validate_link_sender_receiver(unsigned int sender, unsigned int rec
         return ERROR_FORMAT_DATA;
     }    
     if (work_post_offices[sender] == false) {
-        printf("-- ошибка: такого почтового отделения не существует: %ud", sender);
+        printf("-- ошибка: такого почтового отделения не существует: %u", sender);
         return ERROR_POST_OFFICE_NOT_EXIST;
     }
     if (work_post_offices[receiver] == false) {
-        printf("-- ошибка: такого почтового отделения не существует: %ud", receiver);
+        printf("-- ошибка: такого почтового отделения не существует: %u", receiver);
         return ERROR_POST_OFFICE_NOT_EXIST;
     }
     
