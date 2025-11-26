@@ -21,6 +21,8 @@ void pop_from_heap_deleted_letter(PostOffice *post_offices, Letter *letter) {
     for (int i = 0; i < buffer.size; ++i) {
         insert_skew_heap_LetterPtr(&post_offices[id_post_office].letters, get_at_vector_LetterPtr(&buffer, i));
     }
+
+    free(buffer.data);
 }
 
 
@@ -221,7 +223,7 @@ void move_max_priority_letter_from_postoffice(PostOffice *post_offices, bool *wo
 
     pthread_mutex_unlock(mutex_data);
 
-    return;
+    free(vector_letters.data);
 } 
 
 bool move_letter(PostOffice *post_offices, bool *work_post_offices, unsigned int id_post_office, Letter *letter, FILE *output_file) {

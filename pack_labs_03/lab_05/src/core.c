@@ -94,7 +94,6 @@ void* start_interactive_console(void *args) {
     } while (choice != EXIT);
 
     *(thread_args->thread_live) = false;
-    delete_vector_LetterPtr(thread_args->vector_all_letters);
     return NULL;
 }
 
@@ -112,8 +111,8 @@ void start_mail_application(int argc, char *argv[]) {
     if (error != SUCCESS) return;
    
     // создание основной структуры данных
-    PostOffice post_offices[MAX_SIZE_POST_OFFICES]; // массив отделений
-    bool work_post_offices[MAX_SIZE_POST_OFFICES]; // массив, в котором помечены работающие и неработающие отделения
+    PostOffice post_offices[MAX_SIZE_POST_OFFICES] = {0}; // массив отделений
+    bool work_post_offices[MAX_SIZE_POST_OFFICES] = {false}; // массив, в котором помечены работающие и неработающие отделения
     Vector_LetterPtr vector_all_letters = create_vector_impl(); // вектор всех писем
 
     pthread_t interaction_with_user, sending_letters;
@@ -137,7 +136,14 @@ void start_mail_application(int argc, char *argv[]) {
 
     pthread_mutex_destroy(&mutex_data);
 
+    for (int i = 0; i < MAX_SIZE_POST_OFFICES; ++i) {
+        if (work_post_offices[i] == true) {
+            // удаляем структуру кучи
+            delete_skew_heap_LetterPtr(&post_offices[i].letters);
+        }
+    }
     delete_vector_LetterPtr(&vector_all_letters);
+
 
     fclose(input_file);
     fclose(output_file);

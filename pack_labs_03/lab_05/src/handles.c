@@ -138,6 +138,9 @@ error_code_t handle_delete_postoffice(PostOffice *post_offices, bool *work_post_
 
     work_post_offices[id_post_office] = false;
 
+    // удаляем структуру кучи
+    delete_skew_heap_LetterPtr(&post_offices[id_post_office].letters);
+
     fprintf(output_file, "[service interactive with user]: Отделение %u успешно удалено\n", id_post_office);
     fflush(output_file);
     pthread_mutex_unlock(mutex_data);
