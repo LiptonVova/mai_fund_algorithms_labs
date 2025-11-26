@@ -202,14 +202,11 @@ void move_max_priority_letter_from_postoffice(PostOffice *post_offices, bool *wo
         
     }
 
-    int vector_size = vector_letters.size;
-    while (vector_size != 0) {
-        Letter *letter = get_at_vector_LetterPtr(&vector_letters, vector_size - 1);
-        delete_at_vector_LetterPtr(&vector_letters, vector_size - 1);
+    for (int i = vector_letters.size - 1; i >= 0; ++i) {
+        Letter *letter = get_at_vector_LetterPtr(&vector_letters, i);
 
         // возвращаем обратно
         insert_skew_heap_LetterPtr(&post_offices[id_post_office].letters, letter);
-        --vector_size; 
     }
 
     if (max_letter == NULL) {
