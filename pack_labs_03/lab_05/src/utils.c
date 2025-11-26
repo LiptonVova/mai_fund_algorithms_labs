@@ -202,7 +202,7 @@ void move_max_priority_letter_from_postoffice(PostOffice *post_offices, bool *wo
         
     }
 
-    for (int i = vector_letters.size - 1; i >= 0; ++i) {
+    for (int i = vector_letters.size - 1; i >= 0; --i) {
         Letter *letter = get_at_vector_LetterPtr(&vector_letters, i);
 
         // возвращаем обратно
