@@ -40,10 +40,9 @@ Vector_LetterPtr create_vector_impl() {
     return create_vector_LetterPtr(initial_capacity, copy_func, delete_func, comp, default_constructor);
 }
 
-Heap_LetterPtr create_priority_queue_impl() {
-    const size_t initial_capacity = 10;
-    return create_heap_LetterPtr(initial_capacity, delete_func,\
-                    copy_func, comp, default_constructor, swap);
+SkewHeap_LetterPtr create_priority_queue_impl() {
+    return create_skew_heap_LetterPtr(delete_func,\
+                    comp, default_constructor);
 }
 
 void delete_func_size_t(size_t value) {

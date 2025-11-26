@@ -58,7 +58,7 @@ typedef struct {
     unsigned int id; // id почтового отделения
     bool links[MAX_SIZE_POST_OFFICES]; // массив, в котором хранятся связи этого отделения с другими
     unsigned int capacity_post_office; // вместимость почтового отделения
-    Heap_LetterPtr letters; // очередь с приоритетом с письмами
+    SkewHeap_LetterPtr letters; // очередь с приоритетом с письмами
 } PostOffice;
 
 
@@ -80,7 +80,7 @@ typedef enum {
 } Choice;
 
 Vector_LetterPtr create_vector_impl();
-Heap_LetterPtr create_priority_queue_impl();
+SkewHeap_LetterPtr create_priority_queue_impl();
 LinkedList_size_t create_linked_list_stack_queue_impl();
 
 

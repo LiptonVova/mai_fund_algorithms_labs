@@ -137,6 +137,8 @@ void start_mail_application(int argc, char *argv[]) {
 
     pthread_mutex_destroy(&mutex_data);
 
+    delete_vector_LetterPtr(&vector_all_letters);
+
     fclose(input_file);
     fclose(output_file);
 }

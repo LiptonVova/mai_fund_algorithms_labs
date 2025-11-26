@@ -167,18 +167,66 @@ void handle_add(LinkedList_Liver *livers, LinkedList_Command *stack_commands) {
     scanf("%s", temp);
     strcpy(new_liver.middle_name, temp);
     printf("Пожалуйста, введите день рождения жителя (число от 1 до 31): ");
-    scanf("%d", &new_liver.day_birthday);
+
+    // scanf("%d", &new_liver.day_birthday);
+    char day_b[100] = "\0";
+    scanf("%s", day_b);
+    char *endptr;
+    int num = strtol(day_b, &endptr, 10);
+    while (*endptr != '\0' ) {
+        printf("Пожалуйста попробуйте еще раз: ");
+        char temp_day_b[100] = "\0";
+        scanf("%s", temp_day_b);
+        num = strtol(temp_day_b, &endptr, 10);
+    }
+    new_liver.day_birthday = num;
+
     printf("Пожалуйста, введите месяц рождения жителя (число от 1 до 12): ");
-    scanf("%d", &new_liver.month_birthday);
+    // scanf("%d", &new_liver.month_birthday);
+
+    char month_b[100] = "\0";
+    scanf("%s", month_b);
+    num = strtol(month_b, &endptr, 10);
+    while (*endptr != '\0' ) {
+        printf("Пожалуйста попробуйте еще раз: ");
+        char temp_month_b[100] = "\0";
+        scanf("%s", temp_month_b);
+        num = strtol(temp_month_b, &endptr, 10);
+    }
+    new_liver.month_birthday = num;
+
     printf("Пожалуйста, введите год рождения жителя: ");
-    scanf("%d", &new_liver.year_birthday);
+    // scanf("%d", &new_liver.year_birthday);
+
+    char year_b[100] = "\0";
+    scanf("%s", year_b);
+    num = strtol(year_b, &endptr, 10);
+    while (*endptr != '\0' ) {
+        printf("Пожалуйста попробуйте еще раз: ");
+        char temp_year_b[100] = "\0";
+        scanf("%s", temp_year_b);
+        num = strtol(temp_year_b, &endptr, 10);
+    }
+    new_liver.year_birthday = num;
+
     printf("Пожалуйста, введите пол жителя (M - мужской, W - женский): ");
     char new_gender = ' ';
     scanf(" %c", &new_gender);
     new_gender = toupper(new_gender);
     new_liver.gender = new_gender;
+
     printf("Пожалуйста, введите средний доход жителя в месяц: ");
-    scanf("%lf", &new_liver.average_income);
+    // scanf("%lf", &new_liver.average_income);
+    char income[100] = "\0";
+    scanf("%s", income);
+    double income_t = strtod(income, &endptr);
+    while (*endptr != '\0' ) {
+        printf("Пожалуйста попробуйте еще раз: ");
+        char temp_income[100] = "\0";
+        scanf("%s", temp_income);
+        income_t = strtod(temp_income, &endptr);
+    }
+    new_liver.average_income = income_t;
 
     Command command;
     command.name_command = ADD_LIVER;

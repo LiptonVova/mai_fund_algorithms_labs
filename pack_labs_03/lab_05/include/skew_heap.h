@@ -37,7 +37,7 @@ inline static void delete_node_skew_heap_##HEAP_TYPE(Node_##HEAP_TYPE *node, voi
     if (node == NULL) return ;\
     delete_node_skew_heap_##HEAP_TYPE(node->left, delete_func); \
     delete_node_skew_heap_##HEAP_TYPE(node->right, delete_func); \
-    delete_func(node->data); \
+    /* delete_func(node->data); */ \
     free(node);    \
 } \
 inline static void delete_skew_heap_##HEAP_TYPE(SkewHeap_##HEAP_TYPE *heap) { \
@@ -93,7 +93,7 @@ inline static void pop_skew_heap_##HEAP_TYPE(SkewHeap_##HEAP_TYPE *heap) { \
     } \
     Node_##HEAP_TYPE *temp = heap->root;\
     heap->root = merge_skew_heap_##HEAP_TYPE(heap->root->left, heap->root->right, heap->comp); \
-    heap->delete_func(temp->data); \
+    /* heap->delete_func(temp->data); */ \
     free(temp); \
     heap->size--; \
 } \

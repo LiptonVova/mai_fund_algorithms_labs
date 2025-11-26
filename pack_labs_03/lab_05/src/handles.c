@@ -203,7 +203,7 @@ error_code_t handle_add_letter(PostOffice *post_offices, bool *work_post_offices
 
     pthread_mutex_lock(mutex_data);
 
-    push_heap_LetterPtr(&post_offices[id_sender].letters, letter);
+    insert_skew_heap_LetterPtr(&post_offices[id_sender].letters, letter);
     push_back_vector_LetterPtr(vector_all_letters, letter);
 
     fprintf(output_file, "[service interactive with user]: Было добавлено письмо %u\n", letter->id);

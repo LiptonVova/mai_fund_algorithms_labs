@@ -112,7 +112,7 @@ bool validate_work_post_office(PostOffice *post_offices, bool *work_post_offices
         // уже посещали ранее
         return false;
     }
-    Heap_LetterPtr letters = post_offices[next_id_post_office].letters;
+    SkewHeap_LetterPtr letters = post_offices[next_id_post_office].letters;
     if (post_offices[next_id_post_office].capacity_post_office <= letters.size) {
         // переполнено
         return false;

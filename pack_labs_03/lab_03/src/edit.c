@@ -29,12 +29,41 @@ void handle_edit_middle_name(Node_Liver* cur_node) {
 }
 void handle_edit_date_birthday(Node_Liver* cur_node) {
     int new_day = 0, new_month = 0, new_year = 0;
+    char *endptr;
     printf("Введите новое число рождения: ");
-    scanf("%d", &new_day);
+    // scanf("%d", &new_day);
+    char day_b[100] = "\0";
+    scanf("%s", day_b);
+    new_day = strtol(day_b, &endptr, 10);
+    while (*endptr != '\0' ) {
+        printf("Пожалуйста попробуйте еще раз: ");
+        char temp_day_b[100] = "\0";
+        scanf("%s", temp_day_b);
+        new_day = strtol(temp_day_b, &endptr, 10);
+    }
+
     printf("Введите новый месяц рождения (число от 1 до 12): ");
-    scanf("%d", &new_month);
+    // scanf("%d", &new_month);
+    char month_b[100] = "\0";
+    scanf("%s", month_b);
+    new_month = strtol(month_b, &endptr, 10);
+    while (*endptr != '\0' ) {
+        printf("Пожалуйста попробуйте еще раз: ");
+        char temp_month_b[100] = "\0";
+        scanf("%s", temp_month_b);
+        new_month = strtol(temp_month_b, &endptr, 10);
+    }
     printf("Введите новый год рождения: ");
-    scanf("%d", &new_year);
+    // scanf("%d", &new_year);
+    char year_b[100] = "\0";
+    scanf("%s", year_b);
+    new_year = strtol(year_b, &endptr, 10);
+    while (*endptr != '\0' ) {
+        printf("Пожалуйста попробуйте еще раз: ");
+        char temp_year_b[100] = "\0";
+        scanf("%s", temp_year_b);
+        new_year = strtol(temp_year_b, &endptr, 10);
+    }
     
     cur_node->data.day_birthday = new_day;
     cur_node->data.month_birthday = new_month;
@@ -56,7 +85,18 @@ void handle_edit_gender(Node_Liver* cur_node) {
 void handle_edit_income(Node_Liver* cur_node) {
     printf("Введите новый среднемесячный доход: ");
     double new_income = 0;
-    scanf("%lf", &new_income);
+    // scanf("%lf", &new_income);
+    char income[100] = "\0";
+    scanf("%s", income);
+    char *endptr;
+    new_income = strtod(income, &endptr);
+    while (*endptr != '\0' ) {
+        printf("Пожалуйста попробуйте еще раз: ");
+        char temp_income[100] = "\0";
+        scanf("%s", temp_income);
+        new_income = strtod(temp_income, &endptr);
+        
+    }
 
     cur_node->data.average_income = new_income;
     printf("Успешно изменено!\n");

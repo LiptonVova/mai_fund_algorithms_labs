@@ -9,7 +9,8 @@ void pop_from_heap_deleted_letter(PostOffice *post_offices, Letter *letter) {
 
     Vector_LetterPtr buffer = create_vector_impl();
     while (post_offices[id_post_office].letters.size != 0) {
-        Letter *letter = pop_heap_LetterPtr(&post_offices[id_post_office].letters);
+        Letter *letter = peek_skew_heap_LetterPtr(&post_offices[id_post_office].letters);
+        pop_skew_heap_LetterPtr(&post_offices[id_post_office].letters);
         if (letter->id == id_letter) {
             // пропускаем это письмо
             break;
@@ -18,7 +19,7 @@ void pop_from_heap_deleted_letter(PostOffice *post_offices, Letter *letter) {
     }
 
     for (int i = 0; i < buffer.size; ++i) {
-        push_heap_LetterPtr(&post_offices[id_post_office].letters, get_at_vector_LetterPtr(&buffer, i));
+        insert_skew_heap_LetterPtr(&post_offices[id_post_office].letters, get_at_vector_LetterPtr(&buffer, i));
     }
 }
 
@@ -191,7 +192,8 @@ void move_max_priority_letter_from_postoffice(PostOffice *post_offices, bool *wo
     // письмо с максимальным приоритетом
     Letter *max_letter = NULL;
     while (post_offices[id_post_office].letters.size != 0 ) {
-        Letter *letter = pop_heap_LetterPtr(&post_offices[id_post_office].letters);
+        Letter *letter = peek_skew_heap_LetterPtr(&post_offices[id_post_office].letters);
+        pop_skew_heap_LetterPtr(&post_offices[id_post_office].letters);
         push_back_vector_LetterPtr(&vector_letters, letter);
         if (letter->state == IN_THE_PROCCESS_OF_SENDING) {
             max_letter = letter;
@@ -206,7 +208,7 @@ void move_max_priority_letter_from_postoffice(PostOffice *post_offices, bool *wo
         delete_at_vector_LetterPtr(&vector_letters, vector_size - 1);
 
         // возвращаем обратно
-        push_heap_LetterPtr(&post_offices[id_post_office].letters, letter);
+        insert_skew_heap_LetterPtr(&post_offices[id_post_office].letters, letter);
         --vector_size; 
     }
 
@@ -287,8 +289,8 @@ bool move_letter(PostOffice *post_offices, bool *work_post_offices, unsigned int
     }
 
 
-    pop_heap_LetterPtr(&(post_offices[id_post_office].letters));
-    push_heap_LetterPtr(&(post_offices[id_next_post_office].letters), letter);
+    pop_skew_heap_LetterPtr(&(post_offices[id_post_office].letters));
+    insert_skew_heap_LetterPtr(&(post_offices[id_next_post_office].letters), letter);
 
     letter->id_cur_postoffice = id_next_post_office;
 
