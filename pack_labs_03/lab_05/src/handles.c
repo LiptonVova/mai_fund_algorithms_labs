@@ -120,8 +120,8 @@ error_code_t handle_delete_postoffice(PostOffice *post_offices, bool *work_post_
 
             bool flag = move_letter(post_offices, work_post_offices, id_post_office, letter, output_file);
             if (flag == false) {
-                // отправить не получилось, значит, чтобы не было бесконечного цикла - удаляем это письмо
                 pop_from_heap_deleted_letter(post_offices, letter);
+                // отправить не получилось, значит, чтобы не было бесконечного цикла - удаляем это письмо
                 // удаляем из системы
                 letter->state = NOT_DELIVERED;
             }

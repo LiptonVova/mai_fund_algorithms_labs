@@ -201,10 +201,9 @@ void move_max_priority_letter_from_postoffice(PostOffice *post_offices, bool *wo
             max_letter = letter;
             break;
         }
-        
     }
 
-    for (int i = vector_letters.size - 1; i >= 0; --i) {
+    for (int i = vector_letters.size - 1; i >= 0; i--) {
         Letter *letter = get_at_vector_LetterPtr(&vector_letters, i);
 
         // возвращаем обратно
@@ -216,6 +215,7 @@ void move_max_priority_letter_from_postoffice(PostOffice *post_offices, bool *wo
         fprintf(output_file, "[service sending letter]: в отделении %u нет доступных писем\n", id_post_office);
         fflush(output_file);
         pthread_mutex_unlock(mutex_data);
+        free(vector_letters.data);
         return;
     }
 
@@ -288,7 +288,8 @@ bool move_letter(PostOffice *post_offices, bool *work_post_offices, unsigned int
     }
 
 
-    pop_skew_heap_LetterPtr(&(post_offices[id_post_office].letters));
+    // pop_skew_heap_LetterPtr(&(post_offices[id_post_office].letters));
+    pop_from_heap_deleted_letter(post_offices, letter);
     insert_skew_heap_LetterPtr(&(post_offices[id_next_post_office].letters), letter);
 
     letter->id_cur_postoffice = id_next_post_office;
