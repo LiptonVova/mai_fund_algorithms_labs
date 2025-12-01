@@ -16,8 +16,17 @@ int main() {
     int i = 1;
     while (heap.size != 0) {
         int elem = peek(&heap);
-        printf("Элемент №%d = %d", i, elem);
+        printf("Элемент №%d = %d\n", i, elem);
+
         pop(&heap);
+
+        if (i == 5) {
+            printf("Произошла вставка (100) по середине\n");
+            push(&heap, 100);
+
+            printf("Произошла вставка (-100) по середине\n");
+            push(&heap, -100);
+        }
         ++i;
     }
 

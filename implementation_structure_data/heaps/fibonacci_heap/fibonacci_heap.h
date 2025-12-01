@@ -25,7 +25,7 @@ typedef struct {
 Node* create_fibonacci_node(int data);
 Fibonacci_heap create_fibonacci_heap();
 bool push(Fibonacci_heap *heap, int data);
-void merge(Node* node_1, Node* node_2);
+Node* merge(Node* node_1, Node* node_2);
 bool pop(Fibonacci_heap *heap);
 int peek(Fibonacci_heap *heap);
 void free_heap(Fibonacci_heap *heap);

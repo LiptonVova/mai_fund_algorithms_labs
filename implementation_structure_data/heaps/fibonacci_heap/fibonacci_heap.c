@@ -64,7 +64,7 @@ bool push(Fibonacci_heap *heap, int data) {
     return true;
 }
 
-void merge(Node* node_1, Node* node_2) {
+Node* merge(Node* node_1, Node* node_2) {
     // функция, которая мержит два дерева
     // результат всегда хранится в node_1!
     if (node_1->data > node_2->data) {
@@ -82,6 +82,7 @@ void merge(Node* node_1, Node* node_2) {
 
     node_2->right_sibling = node_1->child;
     node_2->left_sibling = NULL;
+    if (node_1->child) node_1->child->left_sibling = node_2;
     node_1->child = node_2;
 
     int max_degree = node_1->degree;
@@ -89,20 +90,21 @@ void merge(Node* node_1, Node* node_2) {
         max_degree = node_2->degree;
     }
     node_1->degree = ++max_degree;
+
+    return node_1;
 }
 
 bool pop(Fibonacci_heap *heap) {
     // проверяем частный случай - куча пуста
     if (!heap->min) return false;
 
-    
     Node *pop_node = heap->min;
     Node *child_pop_node = pop_node->child;
     
     if (pop_node == heap->head) {
         heap->head = heap->head->right_sibling;
     }
-    heap->min = heap->head;
+
 
     Node *next_elem = pop_node->child;
 
@@ -113,6 +115,13 @@ bool pop(Fibonacci_heap *heap) {
     if (right) right->left_sibling = left;
 
     free(pop_node);
+
+    if (heap->size == 1) {
+        heap->min = NULL;
+        heap->head = NULL;
+        heap->size = 0;
+        return true;
+    }
 
     int ARRAY_SIZE = 1; 
     Node** array = (Node**)malloc(sizeof(Node*) * ARRAY_SIZE);
@@ -131,9 +140,12 @@ bool pop(Fibonacci_heap *heap) {
         // подвесили всех детей нашего удаляемого узла
         // к основному списку
         next_elem->right_sibling = heap->head;
-        heap->head->left_sibling = next_elem;
+        
+        // если heap->head == NULL, то тогда куча состояла из одного дерева 
+        if (heap->head) heap->head->left_sibling = next_elem;
         heap->head = child_pop_node;
     }
+    heap->min = heap->head;
 
     // теперь проходимся по всему основному списку и заполняем array
     // при необходимости мержим
@@ -148,6 +160,10 @@ bool pop(Fibonacci_heap *heap) {
         if (degree >= ARRAY_SIZE) {
             const int OLD_ARRAY_SIZE = ARRAY_SIZE;
             ARRAY_SIZE *= 2;
+            while (degree >= ARRAY_SIZE) {
+                ARRAY_SIZE *= 2;
+            }
+            
             Node ** temp = (Node**)realloc(array, sizeof(Node*) * ARRAY_SIZE);
             if (!temp) {
                 free(array);
@@ -163,15 +179,15 @@ bool pop(Fibonacci_heap *heap) {
         if (array[degree] && array[degree] != next_elem) {
             // есть два дерева с одинаковым порядком - нужно их смержить
 
-            merge(next_elem, array[degree]);
-            
+            next_elem = merge(next_elem, array[degree]);
+
             // здесь важно не потерять указатель на head
             if (next_elem == heap->head || array[degree] == heap->head) {
                 // если хотя бы какой то узел являлся головой основного списка, 
                 // то тогда его надо сохранить!
                 heap->head = next_elem;
             }
-
+            
             array[degree] = NULL;
         }
         else {
